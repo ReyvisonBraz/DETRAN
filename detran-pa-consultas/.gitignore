@@ -1,0 +1,9 @@
+venv/
+__pycache__/
+*.pyc
+*.pyo
+exports/
+*.env
+.env
+teste_*.py
+consulta_rapida.py
