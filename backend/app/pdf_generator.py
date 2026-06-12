@@ -15,14 +15,34 @@ from fpdf.enums import XPos, YPos
 from app import settings
 from app.schemas import ResultadoConsulta
 
-AZUL = (37, 99, 235)
-CINZA = (100, 116, 139)
-PRETO = (15, 23, 42)
+AZUL       = (37, 99, 235)
+AZUL_CLARO = (219, 234, 254)
+CINZA      = (100, 116, 139)
+CINZA_BG   = (248, 250, 252)
+PRETO      = (15, 23, 42)
+VERDE      = (22, 163, 74)
+VERMELHO   = (220, 38, 38)
+LARANJA    = (234, 88, 12)
 
 
 def _t(s) -> str:
     # Fontes core do fpdf usam latin-1 (cp1252), que cobre os acentos PT-BR.
     return str(s).encode("latin-1", "replace").decode("latin-1")
+
+
+def _cor_valor(valor: str):
+    """Retorna cor RGB baseada em palavras-chave de status."""
+    v = valor.lower()
+    if any(w in v for w in ("pago", "normal", "ativo", "regular", "nada consta",
+                             "aprovado", "liberado", "ok", "quitado")):
+        return VERDE
+    if any(w in v for w in ("irregular", "vencido", "multa", "bloqueio", "bloqueado",
+                             "suspenso", "cassado", "cancelado", "apreendido", "impedido")):
+        return VERMELHO
+    if any(w in v for w in ("aviso", "atencao", "atencao", "pendenc", "pendente",
+                             "aberto", "em aberto", "notificacao", "notificacao")):
+        return LARANJA
+    return PRETO
 
 
 class _PDF(FPDF):
@@ -50,22 +70,31 @@ class _PDF(FPDF):
 
 
 def _titulo_secao(pdf: _PDF, texto: str):
-    pdf.ln(2)
+    pdf.ln(3)
+    pdf.set_fill_color(*AZUL_CLARO)
     pdf.set_x(pdf.l_margin)
     pdf.set_font("Helvetica", "B", 10)
     pdf.set_text_color(*AZUL)
-    pdf.cell(0, 7, _t(texto.upper()), new_x=XPos.LMARGIN, new_y=YPos.NEXT)
+    pdf.cell(pdf.epw, 8, "  " + _t(texto.upper()), fill=True,
+             new_x=XPos.LMARGIN, new_y=YPos.NEXT)
+    pdf.set_draw_color(*AZUL)
+    pdf.line(pdf.l_margin, pdf.get_y(), pdf.l_margin + pdf.epw, pdf.get_y())
+    pdf.ln(1)
 
 
-def _linha_kv(pdf: _PDF, chave: str, valor: str):
+def _linha_kv(pdf: _PDF, chave: str, valor: str, zebra: bool = False):
+    if zebra:
+        pdf.set_fill_color(*CINZA_BG)
     pdf.set_x(pdf.l_margin)
-    pdf.set_font("Helvetica", "B", 9)
+    pdf.set_font("Helvetica", "B", 8.5)
     pdf.set_text_color(*CINZA)
-    pdf.cell(55, 6, _t(chave), border=0, new_x=XPos.RIGHT, new_y=YPos.TOP)
-    pdf.set_font("Helvetica", "", 9)
-    pdf.set_text_color(*PRETO)
+    pdf.cell(58, 6, _t(chave), border=0, new_x=XPos.RIGHT, new_y=YPos.TOP, fill=zebra)
+    pdf.set_font("Helvetica", "", 8.5)
+    pdf.set_text_color(*_cor_valor(valor))
     largura = max(20, pdf.w - pdf.r_margin - pdf.get_x())
-    pdf.multi_cell(largura, 6, _t(valor), new_x=XPos.LMARGIN, new_y=YPos.NEXT)
+    pdf.multi_cell(largura, 6, _t(valor), new_x=XPos.LMARGIN, new_y=YPos.NEXT, fill=zebra)
+    pdf.set_draw_color(226, 232, 240)
+    pdf.line(pdf.l_margin, pdf.get_y(), pdf.w - pdf.r_margin, pdf.get_y())
 
 
 def _box_destaque(pdf: _PDF, titulo: str, valor: str):
@@ -102,7 +131,7 @@ def gerar_comprovante(resultado: ResultadoConsulta) -> tuple[str, str] | None:
 
     # Destaque para boleto (linha digitavel / total)
     boleto = getattr(resultado, "dados", {})
-    linha = boleto.get("Linha Digitável") or boleto.get("Linha Digitavel")
+    linha = boleto.get("Linha Digitavel") or boleto.get("Linha Digitavel")
     if linha:
         _box_destaque(pdf, "LINHA DIGITAVEL (use para pagar)", linha)
     total = boleto.get("Total")
@@ -110,18 +139,18 @@ def gerar_comprovante(resultado: ResultadoConsulta) -> tuple[str, str] | None:
         _box_destaque(pdf, "VALOR TOTAL", total)
 
     # Dados principais (exceto os ja destacados)
-    pulares = {"Linha Digitável", "Linha Digitavel", "Total"}
+    pulares = {"Linha Digitavel", "Linha Digitavel", "Total"}
     dados = {k: v for k, v in resultado.dados.items() if k not in pulares}
     if dados:
         _titulo_secao(pdf, "Dados")
-        for k, v in dados.items():
-            _linha_kv(pdf, k, v)
+        for i, (k, v) in enumerate(dados.items()):
+            _linha_kv(pdf, k, v, zebra=(i % 2 == 1))
 
     # Secoes
     for nome, conteudo in resultado.secoes.items():
         _titulo_secao(pdf, nome)
-        for k, v in conteudo.items():
-            _linha_kv(pdf, k, v)
+        for i, (k, v) in enumerate(conteudo.items()):
+            _linha_kv(pdf, k, v, zebra=(i % 2 == 1))
 
     # Tabelas
     for tabela in resultado.tabelas:
@@ -131,8 +160,8 @@ def gerar_comprovante(resultado: ResultadoConsulta) -> tuple[str, str] | None:
         for i, linha_t in enumerate(tabela):
             if i:
                 pdf.ln(1)
-            for k, v in linha_t.items():
-                _linha_kv(pdf, k, v)
+            for j, (k, v) in enumerate(linha_t.items()):
+                _linha_kv(pdf, k, v, zebra=(j % 2 == 1))
 
     nome_arquivo = f"comprovante_{resultado.slug}_{uuid.uuid4().hex[:10]}.pdf"
     caminho = os.path.join(settings.STORAGE_DIR, nome_arquivo)
