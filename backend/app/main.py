@@ -27,7 +27,8 @@ app = FastAPI(
 app.add_middleware(
     CORSMiddleware,
     allow_origins=settings.CORS_ORIGINS,
-    allow_credentials=True,
+    # Nao usamos cookies cross-site; manter False permite usar "*" em CORS_ORIGINS.
+    allow_credentials=False,
     allow_methods=["*"],
     allow_headers=["*"],
 )
