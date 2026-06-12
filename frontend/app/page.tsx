@@ -19,12 +19,14 @@ export default function Home() {
   const [selecionadas, setSelecionadas] = useState<Set<string>>(new Set());
   const [valores, setValores] = useState<Record<string, string>>({});
   const [enviando, setEnviando] = useState(false);
+    const [servidorLento, setServidorLento] = useState(false);
 
   useEffect(() => {
+    const timer = setTimeout(() => setServidorLento(true), 5000);
     listarConsultas()
       .then(setConsultas)
       .catch((e) => setErroCarga(e.message))
-      .finally(() => setCarregando(false));
+      .finally(() => { clearTimeout(timer); setCarregando(false); });
   }, []);
 
   const porCategoria = useMemo(() => {
@@ -75,7 +77,7 @@ export default function Home() {
     }
   }
 
-  if (carregando) return <p className="center">Carregando consultas...</p>;
+  if (carregando) return <p className="center">{servidorLento ? "Aguardando servidor... (free tier - ate 1 min)" : "Carregando consultas..."}</p>;
   if (erroCarga)
     return (
       <div className="center">
