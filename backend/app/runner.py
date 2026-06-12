@@ -44,6 +44,13 @@ def _classificar_erro(exc: Exception) -> ErroDetalhe:
             mensagem="O sistema do DETRAN esta indisponivel no momento.",
             detalhe_tecnico=msg, retentavel=True,
         )
+              # DETRAN retorna "Atencao!!" para dados invalidos ou falha no captcha
+          if "atencao" in low or "aten" in low or "erro na consulta" in low:
+                        return ErroDetalhe(
+                                          tipo=TipoErro.SISTEMA,
+                                          mensagem="O DETRAN retornou um aviso. Verifique se a placa e o Renavam estao corretos.",
+                                          detalhe_tecnico=msg, retentavel=True,
+                        )
     if any(k in low for k in ("invalid", "obrigat", "placa", "renavam", "cpf")):
         return ErroDetalhe(
             tipo=TipoErro.VALIDACAO,
