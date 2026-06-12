@@ -1,7 +1,11 @@
 import type { Consulta, Job, CriarJobResponse } from "./types";
 
+// Backend em producao (Render). Pode ser sobrescrito por NEXT_PUBLIC_API_URL
+// (ex: .env.local aponta para http://localhost:8000 durante o desenvolvimento).
+const API_PADRAO = "https://detran-api-1651.onrender.com";
+
 export const API_URL =
-  process.env.NEXT_PUBLIC_API_URL?.replace(/\/$/, "") || "http://localhost:8000";
+  process.env.NEXT_PUBLIC_API_URL?.replace(/\/$/, "") || API_PADRAO;
 
 async function req<T>(path: string, init?: RequestInit): Promise<T> {
   const res = await fetch(`${API_URL}${path}`, {
