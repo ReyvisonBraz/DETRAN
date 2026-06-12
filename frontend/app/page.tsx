@@ -11,6 +11,18 @@ const CATEGORIA_LABEL: Record<string, string> = {
   boleto: "Boletos e documentos",
 };
 
+const ICONES: Record<string, string> = {
+  veiculo_detalhada: "🚗",
+  infracoes: "⚡",
+  gravame: "🏦",
+  crlv_e: "📄",
+  acompanha_documento: "📋",
+  licenciamento_atual: "📅",
+  licenciamento_anterior: "📆",
+  boleto_infracao: "💸",
+  cnh_pontuacao: "🏆",
+};
+
 export default function Home() {
   const router = useRouter();
   const [consultas, setConsultas] = useState<Consulta[]>([]);
@@ -19,7 +31,8 @@ export default function Home() {
   const [selecionadas, setSelecionadas] = useState<Set<string>>(new Set());
   const [valores, setValores] = useState<Record<string, string>>({});
   const [enviando, setEnviando] = useState(false);
-    const [servidorLento, setServidorLento] = useState(false);
+  const [servidorLento, setServidorLento] = useState(false);
+  const [acordando, setAcordando] = useState(false);
 
   useEffect(() => {
     const timer = setTimeout(() => setServidorLento(true), 5000);
@@ -77,7 +90,18 @@ export default function Home() {
     }
   }
 
-  if (carregando) return <p className="center">{servidorLento ? "Aguardando servidor... (free tier - ate 1 min)" : "Carregando consultas..."}</p>;
+  async function acordar() {
+    setAcordando(true);
+    try {
+      const lista = await listarConsultas();
+      setConsultas(lista);
+      setCarregando(false);
+    } catch {}
+    setAcordando(false);
+  }
+
+  if (carregando && !servidorLento) return <p className="center">Carregando consultas...</p>;
+  if (carregando) return <div className="center" style={{paddingTop:"2rem"}}><p style={{marginBottom:"1rem"}}>⏳ Servidor acordando... (1a vez ate 1 min)</p><button className="btn" onClick={acordar} disabled={acordando}>{acordando ? "🔄 Conectando..." : "🔔 Acordar servidor"}</button></div>;
   if (erroCarga)
     return (
       <div className="center">
@@ -109,7 +133,7 @@ export default function Home() {
                   <div className="card-head">
                     <div className="card-check">{sel ? "✓" : ""}</div>
                     <div>
-                      <div className="card-title">{c.titulo}</div>
+                      <div className="card-title">{ICONES[c.slug] || "📋"} {c.titulo}</div>
                       <div className="card-desc">{c.descricao}</div>
                     </div>
                   </div>
