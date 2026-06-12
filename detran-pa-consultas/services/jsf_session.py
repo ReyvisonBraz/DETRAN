@@ -12,17 +12,28 @@ class JsfSession:
         self.session.headers.update(HEADERS)
         self.session.verify = False
 
+    @staticmethod
+    def _build(resp) -> tuple[str, BeautifulSoup]:
+        # O DETRAN-PA serve o HTML em UTF-8 (acentos como bytes UTF-8 e/ou
+        # entidades HTML como &iacute;). Fixar explicitamente evita o fallback
+        # latin-1 do requests quando algum endpoint nao manda charset no header.
+        resp.encoding = "utf-8"
+        soup = BeautifulSoup(resp.text, "lxml")
+        # Remove glifos de icone (material-icons/symbols) que poluem o texto
+        # extraido dos titulos de secao (ex: "personInformacoes do Proprietario").
+        for icon in soup.select("i.material-icons, i.material-symbols-outlined, span.material-icons"):
+            icon.decompose()
+        return str(soup), soup
+
     def get_page(self, url: str) -> tuple[str, BeautifulSoup]:
         resp = self.session.get(url, timeout=30)
         resp.raise_for_status()
-        soup = BeautifulSoup(resp.text, "lxml")
-        return resp.text, soup
+        return self._build(resp)
 
     def submit_form(self, url: str, data: dict) -> tuple[str, BeautifulSoup]:
         resp = self.session.post(url, data=data, timeout=60)
         resp.raise_for_status()
-        soup = BeautifulSoup(resp.text, "lxml")
-        return resp.text, soup
+        return self._build(resp)
 
     @staticmethod
     def extract_viewstate(html: str) -> str | None:

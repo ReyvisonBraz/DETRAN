@@ -89,29 +89,86 @@ class SistransitoService:
         form_action = self.jsf.extract_form_action(soup, "indexBoletoAnoAtual")
         full_action = f"https://sistemas-renavam.detran.pa.gov.br{form_action}" if form_action and form_action.startswith("/") else form_action or url
 
+        # Este form usa nomes de campo SEM o prefixo do form-id (placa1/renavam/
+        # confirma), diferente da consulta de veiculo. Com prefixo, a placa e o
+        # renavam chegam vazios e a pagina apenas recarrega o formulario.
         data = {
             "indexBoletoAnoAtual": "indexBoletoAnoAtual",
-            "indexBoletoAnoAtual:placa1": placa.upper(),
-            "indexBoletoAnoAtual:renavam": renavam,
+            "placa1": placa.upper(),
+            "renavam": renavam,
             "javax.faces.ViewState": view_state,
-            "indexBoletoAnoAtual:confirma": "Consultar Orçamento",
+            "confirma": "Consultar Orçamento",
         }
         html, soup = self._solve_recaptcha_and_submit(url, full_action, data)
         result = parse_licenciamento(html, soup)
 
-        if salvar_pdf:
-            pdf_links = soup.find_all("a", href=True)
-            for link in pdf_links:
-                href = link.get("href", "")
-                if "pdf" in href.lower() or "boleto" in href.lower() or "impressao" in href.lower():
-                    pdf_url = href if href.startswith("http") else f"https://sistemas-renavam.detran.pa.gov.br{href}"
-                    if self.jsf.save_pdf(pdf_url, salvar_pdf):
-                        result["pdf_path"] = salvar_pdf
-                        break
-            if "pdf_path" not in result:
-                result["pdf_path"] = None
-                result["pdf_note"] = "Verifique o HTML para links de PDF"
+        # Etapa 3: a pagina de resultado tem o form "confirmacaoBoletoAnoAtual"
+        # com o link "2a Via Boleto" (componente :segundaVia). Esse POST emite o
+        # boleto e retorna a Linha Digitavel (o DETRAN-PA nao entrega PDF aqui;
+        # o PDF/comprovante e gerado pelo backend a partir destes dados).
+        boleto = self._emitir_boleto(html, soup, "confirmacaoBoletoAnoAtual", salvar_pdf)
+        if boleto:
+            result.setdefault("dados", {}).update(boleto.get("campos", {}))
+            if boleto.get("pdf_path"):
+                result["pdf_path"] = boleto["pdf_path"]
         return result
+
+    @staticmethod
+    def _abs_url(action: str) -> str:
+        return (
+            f"https://sistemas-renavam.detran.pa.gov.br{action}"
+            if action.startswith("/") else action
+        )
+
+    def _emitir_boleto(
+        self, html: str, soup: BeautifulSoup, form_id: str, salvar_pdf: str = None
+    ) -> dict | None:
+        """Fluxo do boleto em 2 POSTs:
+        - etapa A ('2a Via Boleto' / :segundaVia) -> pagina com a Linha Digitavel;
+        - etapa B ('Salvar Boleto' / :gerarBoleto) -> PDF do boleto.
+        """
+        form = soup.find("form", {"id": form_id})
+        if not form:
+            return None
+        try:
+            html3, soup3 = self.jsf.submit_form(
+                self._abs_url(form.get("action") or ""),
+                {
+                    form_id: form_id,
+                    f"{form_id}:segundaVia": f"{form_id}:segundaVia",
+                    "javax.faces.ViewState": self.jsf.extract_viewstate(html),
+                },
+            )
+        except Exception:
+            return None
+
+        campos = {}
+        m = re.search(r"\b(\d{40,50})\b", soup3.get_text())
+        if m:
+            campos["Linha Digitável"] = m.group(1)
+        if "gerado com sucesso" in html3.lower():
+            campos["Situação"] = "Boleto gerado com sucesso"
+
+        # Etapa B: botao "Salvar Boleto" (:gerarBoleto) retorna o PDF
+        pdf_path = None
+        form3 = soup3.find("form", {"id": form_id})
+        if form3 and salvar_pdf:
+            try:
+                ok = self.jsf.save_pdf(
+                    self._abs_url(form3.get("action") or ""),
+                    salvar_pdf,
+                    data={
+                        form_id: form_id,
+                        f"{form_id}:gerarBoleto": "Salvar Boleto",
+                        "javax.faces.ViewState": self.jsf.extract_viewstate(html3),
+                    },
+                )
+                if ok:
+                    pdf_path = salvar_pdf
+            except Exception:
+                pdf_path = None
+
+        return {"campos": campos, "pdf_path": pdf_path}
 
     def boleto_licenciamento_anterior(
         self, placa: str, renavam: str, salvar_pdf: str = None
