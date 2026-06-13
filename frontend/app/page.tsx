@@ -5,22 +5,22 @@ import { useRouter } from "next/navigation";
 import { listarConsultas, criarJob } from "@/lib/api";
 import type { Consulta, CampoEntrada } from "@/lib/types";
 
-const CATEGORIA_LABEL: Record<string, string> = {
-  veiculo: "Veiculo",
-  habilitacao: "Habilitacao (CNH)",
-  boleto: "Boletos e documentos",
+const CATEGORIA_CONFIG: Record<string, { label: string; icon: string; desc: string }> = {
+  veiculo:     { label: "Veículo",           icon: "🚗", desc: "Débitos, gravames, licenciamento e infrações do veículo" },
+  habilitacao: { label: "Habilitação (CNH)", icon: "🪪", desc: "Pontuação, situação e validade da CNH do motorista" },
+  boleto:      { label: "Boletos e Docs",    icon: "📋", desc: "Emissão de boletos de infrações e documentos digitais" },
 };
 
 const ICONES: Record<string, string> = {
-  veiculo_detalhada: "🚗",
-  infracoes: "⚡",
-  gravame: "🏦",
-  crlv_e: "📄",
-  acompanha_documento: "📋",
-  licenciamento_atual: "📅",
+  veiculo_detalhada:      "🚗",
+  infracoes:              "⚡",
+  gravame:                "🏦",
+  crlv_e:                 "📄",
+  acompanha_documento:    "📋",
+  licenciamento_atual:    "📅",
   licenciamento_anterior: "📆",
-  boleto_infracao: "💸",
-  cnh_pontuacao: "🏆",
+  boleto_infracao:        "💸",
+  cnh_pontuacao:          "🏆",
 };
 
 export default function Home() {
@@ -42,13 +42,22 @@ export default function Home() {
       .finally(() => { clearTimeout(timer); setCarregando(false); });
   }, []);
 
+  async function acordar() {
+    setAcordando(true);
+    try {
+      const lista = await listarConsultas();
+      setConsultas(lista);
+      setCarregando(false);
+    } catch {}
+    setAcordando(false);
+  }
+
   const porCategoria = useMemo(() => {
     const m: Record<string, Consulta[]> = {};
     for (const c of consultas) (m[c.categoria] ??= []).push(c);
     return m;
   }, [consultas]);
 
-  // Campos exigidos pela uniao das consultas selecionadas
   const camposNecessarios = useMemo(() => {
     const vistos = new Map<string, CampoEntrada>();
     for (const c of consultas) {
@@ -90,66 +99,91 @@ export default function Home() {
     }
   }
 
-  async function acordar() {
-    setAcordando(true);
-    try {
-      const lista = await listarConsultas();
-      setConsultas(lista);
-      setCarregando(false);
-    } catch {}
-    setAcordando(false);
-  }
+  if (carregando && !servidorLento) return (
+    <div className="center">
+      <div className="spinner"></div>
+      <p style={{ marginTop: "1.2rem", color: "var(--muted)" }}>Carregando consultas...</p>
+    </div>
+  );
 
-  if (carregando && !servidorLento) return <p className="center">Carregando consultas...</p>;
-  if (carregando) return <div className="center" style={{paddingTop:"2rem"}}><p style={{marginBottom:"1rem"}}>⏳ Servidor acordando... (1a vez ate 1 min)</p><button className="btn" onClick={acordar} disabled={acordando}>{acordando ? "🔄 Conectando..." : "🔔 Acordar servidor"}</button></div>;
-  if (erroCarga)
-    return (
-      <div className="center">
-        <p>Nao foi possivel carregar o catalogo.</p>
-        <p className="alert erro">{erroCarga}</p>
-        <p>Verifique se o backend esta rodando (NEXT_PUBLIC_API_URL).</p>
+  if (carregando) return (
+    <div className="center">
+      <div className="wakeup-card">
+        <div className="wakeup-icon">⏳</div>
+        <div className="wakeup-title">Servidor acordando</div>
+        <div className="wakeup-desc">
+          O servidor hiberna após inatividade (free tier).<br />
+          Aguarde até 1 minuto ou clique para tentar novamente.
+        </div>
+        <button className="btn" onClick={acordar} disabled={acordando}>
+          {acordando ? "🔄 Conectando..." : "🔔 Acordar servidor"}
+        </button>
       </div>
-    );
+    </div>
+  );
+
+  if (erroCarga) return (
+    <div className="center">
+      <p>Não foi possível carregar o catálogo.</p>
+      <p>{erroCarga}</p>
+      <p>Verifique se o backend está rodando.</p>
+    </div>
+  );
+
+  let cardIndex = 0;
 
   return (
     <>
-      <h1>O que voce quer consultar?</h1>
+      <h1>O que você quer consultar?</h1>
       <p className="subtitle">
-        Marque uma ou varias consultas e faca tudo de uma vez. Preencha os dados abaixo.
+        Selecione uma ou mais consultas e execute tudo de uma vez. Preencha os dados necessários abaixo.
       </p>
 
-      {Object.entries(porCategoria).map(([cat, lista]) => (
-        <div key={cat}>
-          <h2>{CATEGORIA_LABEL[cat] || cat}</h2>
-          <div className="grid">
-            {lista.map((c) => {
-              const sel = selecionadas.has(c.slug);
-              return (
-                <div
-                  key={c.slug}
-                  className={`card${sel ? " selected" : ""}`}
-                  onClick={() => toggle(c.slug)}
-                >
-                  <div className="card-head">
-                    <div className="card-check">{sel ? "✓" : ""}</div>
-                    <div>
-                      <div className="card-title">{ICONES[c.slug] || "📋"} {c.titulo}</div>
-                      <div className="card-desc">{c.descricao}</div>
+      {Object.entries(porCategoria).map(([cat, lista]) => {
+        const cfg = CATEGORIA_CONFIG[cat] || { label: cat, icon: "📋", desc: "" };
+        return (
+          <div key={cat} className="cat-section">
+            <div className={`cat-header ${cat}`}>
+              <div className={`cat-icon-wrap ${cat}`}>{cfg.icon}</div>
+              <div className="cat-info">
+                <div className="cat-label">{cfg.label}</div>
+                {cfg.desc && <div className="cat-desc">{cfg.desc}</div>}
+              </div>
+              <span className="cat-count">{lista.length} consulta{lista.length > 1 ? "s" : ""}</span>
+            </div>
+            <div className="grid">
+              {lista.map((c) => {
+                const sel = selecionadas.has(c.slug);
+                const delay = cardIndex++ * 55;
+                return (
+                  <div
+                    key={c.slug}
+                    className={`card${sel ? " selected" : ""}`}
+                    onClick={() => toggle(c.slug)}
+                    style={{ animationDelay: `${delay}ms` }}
+                  >
+                    <div className="card-head">
+                      <div className="card-check">{sel ? "✓" : ""}</div>
+                      <div style={{ flex: 1 }}>
+                        <span className="card-icon">{ICONES[c.slug] || cfg.icon}</span>
+                        <div className="card-title">{c.titulo}</div>
+                        <div className="card-desc">{c.descricao}</div>
+                      </div>
+                    </div>
+                    <div className="badges">
+                      {c.gera_pdf && <span className="badge pdf">📄 PDF</span>}
+                      {c.gera_boleto && <span className="badge">Boleto</span>}
+                      <span className="badge credito">
+                        {c.creditos} crédito{c.creditos > 1 ? "s" : ""}
+                      </span>
                     </div>
                   </div>
-                  <div className="badges">
-                    {c.gera_pdf && <span className="badge pdf">📄 Gera PDF</span>}
-                    {c.gera_boleto && <span className="badge">Boleto</span>}
-                    <span className="badge credito">
-                      {c.creditos} credito{c.creditos > 1 ? "s" : ""}
-                    </span>
-                  </div>
-                </div>
-              );
-            })}
+                );
+              })}
+            </div>
           </div>
-        </div>
-      ))}
+        );
+      })}
 
       {camposNecessarios.length > 0 && (
         <>
@@ -177,13 +211,13 @@ export default function Home() {
 
       <div className="bar">
         <div className="bar-info">
-          <b>{selecionadas.size}</b> consulta(s) selecionada(s) · <b>{totalCreditos}</b> credito(s)
+          <b>{selecionadas.size}</b> consulta(s) · <b>{totalCreditos}</b> crédito(s)
           {faltando.length > 0 && selecionadas.size > 0 && (
             <span> · faltam: {faltando.map((f) => f.rotulo).join(", ")}</span>
           )}
         </div>
         <button className="btn" disabled={!podeEnviar} onClick={enviar}>
-          {enviando ? "Iniciando..." : "Consultar agora"}
+          {enviando ? "Iniciando..." : "Consultar agora →"}
         </button>
       </div>
     </>
