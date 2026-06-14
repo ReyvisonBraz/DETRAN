@@ -81,3 +81,70 @@ export interface CriarJobResponse {
   status: StatusJob;
   total: number;
 }
+
+// ── Auth & Users ──
+
+export type UserRole = "cliente" | "admin";
+
+export interface UserProfile {
+  uid: string;
+  email: string;
+  nome: string;
+  sobrenome: string;
+  telefone: string | null;
+  fotoURL: string | null;
+  role: UserRole;
+  saldoCreditos: number;
+  totalConsultas: number;
+  createdAt: string;
+  updatedAt: string;
+  perfilCompleto: boolean;
+}
+
+// ── Créditos & Transações ──
+
+export type TipoTransacao = "recarga" | "consumo" | "reembolso" | "bonus";
+export type StatusTransacao = "pendente" | "confirmado" | "cancelado" | "estornado";
+export type MetodoPagamento = "pix" | "cartao_credito" | "cartao_debito" | "mercado_pago" | "bonus" | "admin";
+
+export interface Transacao {
+  id: string;
+  uid: string;
+  tipo: TipoTransacao;
+  creditos: number;
+  valorReais: number | null;
+  descricao: string;
+  metodoPagamento: MetodoPagamento | null;
+  status: StatusTransacao;
+  pagamentoId: string | null;
+  jobId: string | null;
+  createdAt: string;
+  confirmedAt: string | null;
+}
+
+export interface PacoteCreditos {
+  id: string;
+  creditos: number;
+  preco: number;
+  titulo: string;
+}
+
+// ── Pagamentos ──
+
+export type StatusPagamento = "aguardando" | "pago" | "cancelado" | "estornado";
+
+export interface Pagamento {
+  id: string;
+  uid: string;
+  gateway: "mercado_pago";
+  gatewayId: string;
+  tipo: "pix" | "cartao_credito" | "cartao_debito";
+  valor: number;
+  creditos: number;
+  status: StatusPagamento;
+  pixQrCode: string | null;
+  pixCopiaCola: string | null;
+  pixExpiracao: string | null;
+  createdAt: string;
+  pagoEm: string | null;
+}
