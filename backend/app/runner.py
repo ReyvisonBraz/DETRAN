@@ -6,7 +6,7 @@ Responsabilidades:
   - classificar erros (CAPTCHA, validacao, sistema, timeout...);
   - salvar PDFs/boletos e expor link de download.
 """
-h
+
 import os
 import time
 import uuid
