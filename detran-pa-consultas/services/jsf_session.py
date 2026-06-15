@@ -83,12 +83,12 @@ class JsfSession:
                 else:
                     messages.append(msg)
         if not messages:
-                        # PrimeFaces error/warning detail messages
-                        for el in soup.select(".ui-messages-error-detail, .ui-messages-warn-detail"):
-                                            msg = el.get_text(strip=True)
-                                            if msg:
-                                                                    messages.append(msg)
-                                                if not messages:
+            # PrimeFaces error/warning detail messages
+            for el in soup.select(".ui-messages-error-detail, .ui-messages-warn-detail"):
+                msg = el.get_text(strip=True)
+                if msg:
+                    messages.append(msg)
+        if not messages:
             for p in soup.select(".alert-title"):
                 messages.append(p.get_text(strip=True))
         return messages
