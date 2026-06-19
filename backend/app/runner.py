@@ -32,6 +32,12 @@ def _classificar_erro(exc: Exception) -> ErroDetalhe:
             mensagem="A consulta demorou demais para responder. Tente novamente.",
             detalhe_tecnico=msg, retentavel=True,
         )
+if "mcaptcha" in low:
+        return ErroDetalhe(
+            tipo=TipoErro.CAPTCHA,
+            mensagem="Falha na verificacao mCaptcha do DETRAN. Tente novamente.",
+            detalhe_tecnico=msg, retentavel=True,
+        )
     if "recaptcha" in low or "captcha" in low:
         return ErroDetalhe(
             tipo=TipoErro.CAPTCHA,
@@ -161,6 +167,7 @@ def _anexar_documentos(consulta, bruto, service, res: ResultadoConsulta):
 def _exec_handler(consulta: catalog.Consulta, p: dict, salvar_pdf: str | None):
     solver = _novo_solver()
     h = consulta.handler
+    captcha_token = p.get("mcaptcha_token") or p.get("captcha_token")
 
     if consulta.sistema == catalog.Sistema.RENACH:
         svc = RenachService(solver)
@@ -168,25 +175,34 @@ def _exec_handler(consulta: catalog.Consulta, p: dict, salvar_pdf: str | None):
         svc = SistransitoService(solver)
 
     if h == "consulta_veiculo":
-        bruto = svc.consulta_veiculo(p["placa"], p["renavam"])
+        bruto = svc.consulta_veiculo(p["placa"], p["renavam"], captcha_token=captcha_token)
     elif h == "consulta_infracoes":
-        bruto = svc.consulta_infracoes(p["placa"], p["renavam"])
+        bruto = svc.consulta_infracoes(p["placa"], p["renavam"], captcha_token=captcha_token)
     elif h == "boleto_licenciamento_atual":
-        bruto = svc.boleto_licenciamento_atual(p["placa"], p["renavam"], salvar_pdf=salvar_pdf)
+        bruto = svc.boleto_licenciamento_atual(
+            p["placa"], p["renavam"], salvar_pdf=salvar_pdf, captcha_token=captcha_token
+        )
     elif h == "boleto_licenciamento_anterior":
-        bruto = svc.boleto_licenciamento_anterior(p["placa"], p["renavam"], salvar_pdf=salvar_pdf)
+        bruto = svc.boleto_licenciamento_anterior(
+            p["placa"], p["renavam"], salvar_pdf=salvar_pdf, captcha_token=captcha_token
+        )
     elif h == "boleto_infracao":
-        bruto = svc.boleto_infracao(p["placa"], p["renavam"], veiculo_para=True)
+        bruto = svc.boleto_infracao(
+            p["placa"], p["renavam"], veiculo_para=True, captcha_token=captcha_token
+        )
     elif h == "gravame":
-        bruto = svc.gravame(p["chassi"])
+        bruto = svc.gravame(p["chassi"], captcha_token=captcha_token)
     elif h == "crlv_e":
-        bruto = svc.crlv_e(p["placa"], p["renavam"], p.get("cpf_cnpj", ""))
+        bruto = svc.crlv_e(
+            p["placa"], p["renavam"], p.get("cpf_cnpj", ""), captcha_token=captcha_token
+        )
     elif h == "acompanha_documento":
         bruto = svc.acompanha_documento(
             renavam=p.get("renavam"),
             chassi=p.get("chassi"),
             no_boleto=p.get("no_boleto") or None,
             modo="C" if p.get("chassi") else "P",
+            captcha_token=captcha_token,
         )
     elif h == "consulta_pontuacao_cnh":
         bruto = svc.consulta_pontuacao_cnh(p["cpf"])

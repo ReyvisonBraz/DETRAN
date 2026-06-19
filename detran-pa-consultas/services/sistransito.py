@@ -24,22 +24,25 @@ class SistransitoService:
         html, soup = self.jsf.get_page(url)
         return html, soup
 
-    def _solve_recaptcha_and_submit(
+    def _solve_captcha_and_submit(
         self,
         page_url: str,
         form_action: str,
         form_data: dict,
+        page_html: str,
+        captcha_token: str = None,
     ) -> tuple[str, BeautifulSoup]:
-        token = self.captcha.solve_recaptcha_v2(page_url)
-        form_data["g-recaptcha-response"] = token
+        field, token = self.captcha.solve_for_page(page_url, page_html)
+        form_data[field] = token
+
         html, soup = self.jsf.submit_form(form_action, form_data)
-        if self.jsf.is_error_page(html):
+        if self.jsf.is_error_page(html) or self.jsf.check_recaptcha_error(html):
             errors = self.jsf.get_error_messages(html)
             raise RuntimeError(f"Erro na consulta: {errors}")
         return html, soup
 
     def consulta_veiculo(
-        self, placa: str, renavam: str
+        self, placa: str, renavam: str, captcha_token: str = None
     ) -> dict:
         url = ENDPOINTS["veiculo_detalhada"]
         html, soup = self._get_page_state(url)
@@ -57,11 +60,11 @@ class SistransitoService:
             "javax.faces.ViewState": view_state,
             "indexRenavam:confirma": "Consultar Veículo",
         }
-        html, soup = self._solve_recaptcha_and_submit(url, full_action, data)
+        html, soup = self._solve_captcha_and_submit(url, full_action, data, html, captcha_token)
         return parse_veiculo_detalhada(html, soup)
 
     def consulta_infracoes(
-        self, placa: str, renavam: str
+        self, placa: str, renavam: str, captcha_token: str = None
     ) -> dict:
         url = ENDPOINTS["infracoes"]
         html, soup = self._get_page_state(url)
@@ -76,11 +79,11 @@ class SistransitoService:
             "javax.faces.ViewState": view_state,
             "confirma": "Confirmar",
         }
-        html, soup = self._solve_recaptcha_and_submit(url, full_action, data)
+        html, soup = self._solve_captcha_and_submit(url, full_action, data, html, captcha_token)
         return parse_infracoes(html, soup)
 
     def boleto_licenciamento_atual(
-        self, placa: str, renavam: str, salvar_pdf: str = None
+        self, placa: str, renavam: str, salvar_pdf: str = None, captcha_token: str = None
     ) -> dict:
         url = ENDPOINTS["licenciamento_atual"]
         html, soup = self._get_page_state(url)
@@ -99,7 +102,7 @@ class SistransitoService:
             "javax.faces.ViewState": view_state,
             "confirma": "Consultar Orçamento",
         }
-        html, soup = self._solve_recaptcha_and_submit(url, full_action, data)
+        html, soup = self._solve_captcha_and_submit(url, full_action, data, html, captcha_token)
         result = parse_licenciamento(html, soup)
 
         # Etapa 3: a pagina de resultado tem o form "confirmacaoBoletoAnoAtual"
@@ -171,7 +174,7 @@ class SistransitoService:
         return {"campos": campos, "pdf_path": pdf_path}
 
     def boleto_licenciamento_anterior(
-        self, placa: str, renavam: str, salvar_pdf: str = None
+        self, placa: str, renavam: str, salvar_pdf: str = None, captcha_token: str = None
     ) -> dict:
         url = ENDPOINTS["licenciamento_anterior"]
         html, soup = self._get_page_state(url)
@@ -187,7 +190,7 @@ class SistransitoService:
             "javax.faces.ViewState": view_state,
             "indexBoletoAnoAnterior:confirma": "Confirmar",
         }
-        html, soup = self._solve_recaptcha_and_submit(url, full_action, data)
+        html, soup = self._solve_captcha_and_submit(url, full_action, data, html, captcha_token)
         result = parse_licenciamento(html, soup)
 
         if salvar_pdf:
@@ -202,7 +205,7 @@ class SistransitoService:
         return result
 
     def boleto_infracao(
-        self, placa: str, renavam: str, veiculo_para: bool = True
+        self, placa: str, renavam: str, veiculo_para: bool = True, captcha_token: str = None
     ) -> dict:
         url = ENDPOINTS["boleto_infracao"]
         html, soup = self._get_page_state(url)
@@ -249,12 +252,12 @@ class SistransitoService:
             data_etapa2["indexBoletoInfracao:cpfCnpj"] = ""
             data_etapa2["indexBoletoInfracao:nomeCompleto"] = ""
 
-        html, soup = self._solve_recaptcha_and_submit(
-            ENDPOINTS["boleto_infracao"], full_action_2, data_etapa2
+        html, soup = self._solve_captcha_and_submit(
+            ENDPOINTS["boleto_infracao"], full_action_2, data_etapa2, html, captcha_token
         )
         return parse_licenciamento(html, soup)
 
-    def gravame(self, chassi: str) -> dict:
+    def gravame(self, chassi: str, captcha_token: str = None) -> dict:
         url = ENDPOINTS["gravame"]
         html, soup = self._get_page_state(url)
         view_state = self.jsf.extract_viewstate(html)
@@ -267,10 +270,10 @@ class SistransitoService:
             "javax.faces.ViewState": view_state,
             "indexGravame:confirma": "Confirmar",
         }
-        html, soup = self._solve_recaptcha_and_submit(url, full_action, data)
+        html, soup = self._solve_captcha_and_submit(url, full_action, data, html, captcha_token)
         return self._parse_generic_result(html, soup, "Consulta Gravame")
 
-    def crlv_e(self, placa: str, renavam: str, cpf_cnpj: str) -> dict:
+    def crlv_e(self, placa: str, renavam: str, cpf_cnpj: str, captcha_token: str = None) -> dict:
         url = ENDPOINTS["crlv_e"]
         html, soup = self._get_page_state(url)
         view_state = self.jsf.extract_viewstate(html)
@@ -284,11 +287,12 @@ class SistransitoService:
             "indexCRLVe:cpfCnpj": cpf_cnpj,
             "javax.faces.ViewState": view_state,
         }
-        html, soup = self._solve_recaptcha_and_submit(url, full_action, data)
+        html, soup = self._solve_captcha_and_submit(url, full_action, data, html, captcha_token)
         return self._parse_generic_result(html, soup, "CRLV-e")
 
     def acompanha_documento(
-        self, renavam: str = None, chassi: str = None, no_boleto: str = None, modo: str = "P"
+        self, renavam: str = None, chassi: str = None, no_boleto: str = None,
+        modo: str = "P", captcha_token: str = None
     ) -> dict:
         url = ENDPOINTS["acompanha_documento"]
         html, soup = self._get_page_state(url)
@@ -310,7 +314,7 @@ class SistransitoService:
         if no_boleto:
             data["noBoleto"] = no_boleto
 
-        html, soup = self._solve_recaptcha_and_submit(url, full_action, data)
+        html, soup = self._solve_captcha_and_submit(url, full_action, data, html, captcha_token)
         return parse_acompanha_documento(html, soup)
 
     def _parse_generic_result(self, html: str, soup: BeautifulSoup, title: str) -> dict:

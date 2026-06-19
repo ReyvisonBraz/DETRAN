@@ -16,7 +16,10 @@ USER_AGENT = (
     "Chrome/126.0.0.0 Safari/537.36"
 )
 
-CAPTCHA_TIMEOUT = 180
+CAPTCHA_TIMEOUT = int(os.getenv("CAPTCHA_TIMEOUT", "180"))
+REQUEST_CONNECT_TIMEOUT = float(os.getenv("REQUEST_CONNECT_TIMEOUT", "10"))
+REQUEST_READ_TIMEOUT = float(os.getenv("REQUEST_READ_TIMEOUT", "90"))
+REQUEST_RETRIES = int(os.getenv("REQUEST_RETRIES", "2"))
 
 ENDPOINTS = {
     "veiculo_detalhada": f"{SISTRANSITO_BASE}/servicos/veiculos/indexRenavam.jsf",

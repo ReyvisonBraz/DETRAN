@@ -10,7 +10,7 @@ const STATUS_FINAL = new Set(["concluido", "parcial", "erro"]);
 const ERRO_CONFIG: Record<string, { titulo: string; descricao: string; icone: JSX.Element; cor: string; retentar: boolean }> = {
   captcha: {
     titulo: "Falha na verificacao de seguranca",
-    descricao: "O sistema do DETRAN-PA exige um CAPTCHA que nao pudemos resolver automaticamente. Isso acontece quando o site esta com muito acesso ou quando o CAPTCHA expira rapidamente.",
+    descricao: "O sistema do DETRAN-PA nao conseguiu validar o CAPTCHA automaticamente. Isso pode acontecer por instabilidade do site ou excesso de acessos. Tente novamente em instantes.",
     cor: "amber",
     retentar: true,
     icone: (
