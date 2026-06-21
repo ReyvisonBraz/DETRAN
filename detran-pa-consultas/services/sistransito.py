@@ -33,7 +33,8 @@ class SistransitoService:
         captcha_token: str = None,
     ) -> tuple[str, BeautifulSoup]:
         field, token = self.captcha.solve_for_page(page_url, page_html)
-        form_data[field] = token
+        if field and token:
+            form_data[field] = token
 
         html, soup = self.jsf.submit_form(form_action, form_data)
         if self.jsf.is_error_page(html) or self.jsf.check_recaptcha_error(html):
@@ -214,10 +215,24 @@ class SistransitoService:
         form_action = self.jsf.extract_form_action(soup, "indexBoletoInfracao")
         full_action = f"https://sistemas-renavam.detran.pa.gov.br{form_action}" if form_action and form_action.startswith("/") else form_action or url
 
+        # Localizar o radio button dinamicamente por value em vez de JSP ID instavel.
+        # O radio tem name como "indexBoletoInfracao:j_idt21" (auto-gerado porem
+        # com prefixo do form), e values "veiculosPara" ou "veiculosOutroEstado".
         tipo = "veiculosPara" if veiculo_para else "veiculosOutroEstado"
+        radio_name = None
+        for radio in soup.find_all("input", {"type": "radio"}):
+            radio_value = radio.get("value", "")
+            if radio_value in ("veiculosPara", "veiculosOutroEstado"):
+                radio_name = radio.get("name")
+                break
+
+        if not radio_name:
+            # Fallback: tentar pelo ID antigo (pode ter mudado no deploy)
+            radio_name = "indexBoletoInfracao:j_idt21"
+
         data_etapa1 = {
             "indexBoletoInfracao": "indexBoletoInfracao",
-            "indexBoletoInfracao:j_idt21": tipo,
+            radio_name: tipo,
             "javax.faces.ViewState": view_state,
             "indexBoletoInfracao:confirma": "Continuar",
         }
@@ -280,12 +295,15 @@ class SistransitoService:
         form_action = self.jsf.extract_form_action(soup, "indexCRLVe")
         full_action = f"https://sistemas-renavam.detran.pa.gov.br{form_action}" if form_action and form_action.startswith("/") else form_action or url
 
+        # O botao de submit do CRLV-e e um link <a> com mojarra.jsfcljs,
+        # nao um <input type=submit>. Precisamos enviar o nome do link como campo.
         data = {
             "indexCRLVe": "indexCRLVe",
             "indexCRLVe:placa": placa.upper(),
             "indexCRLVe:renavam": renavam,
             "indexCRLVe:cpfCnpj": cpf_cnpj,
             "javax.faces.ViewState": view_state,
+            "indexCRLVe:confirma": "indexCRLVe:confirma",
         }
         html, soup = self._solve_captcha_and_submit(url, full_action, data, html, captcha_token)
         return self._parse_generic_result(html, soup, "CRLV-e")

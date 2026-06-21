@@ -1,10 +1,10 @@
 """Executa uma consulta do catalogo e normaliza o resultado.
 
 Responsabilidades:
-  - chamar o metodo correto do motor com os parametros certos;
-  - traduzir o dict cru do motor para ResultadoConsulta;
-  - classificar erros (CAPTCHA, validacao, sistema, timeout...);
-  - salvar PDFs/boletos e expor link de download.
+- chamar o metodo correto do motor com os parametros certos;
+- traduzir o dict cru do motor para ResultadoConsulta;
+- classificar erros (CAPTCHA, validacao, sistema, timeout...);
+- salvar PDFs no Firebase Storage (persistente, 5 dias) com fallback local.
 """
 
 import os
@@ -12,16 +12,14 @@ import time
 import uuid
 import requests
 
-from app import catalog, settings, pdf_generator
+from app import catalog, settings, pdf_generator, firebase_storage
 from app.engine_bridge import SistransitoService, RenachService, CaptchaSolver
 from app.schemas import (
-    ResultadoConsulta, StatusResultado, ErroDetalhe, TipoErro, Documento,
+ResultadoConsulta, StatusResultado, ErroDetalhe, TipoErro, Documento,
 )
-
 
 def _novo_solver() -> CaptchaSolver:
     return CaptchaSolver(api_key=settings.TWOCAPTCHA_API_KEY or None)
-
 
 def _classificar_erro(exc: Exception) -> ErroDetalhe:
     msg = str(exc)
@@ -30,12 +28,6 @@ def _classificar_erro(exc: Exception) -> ErroDetalhe:
         return ErroDetalhe(
             tipo=TipoErro.TIMEOUT,
             mensagem="A consulta demorou demais para responder. Tente novamente.",
-            detalhe_tecnico=msg, retentavel=True,
-        )
-if "mcaptcha" in low:
-        return ErroDetalhe(
-            tipo=TipoErro.CAPTCHA,
-            mensagem="Falha na verificacao mCaptcha do DETRAN. Tente novamente.",
             detalhe_tecnico=msg, retentavel=True,
         )
     if "recaptcha" in low or "captcha" in low:
@@ -50,7 +42,6 @@ if "mcaptcha" in low:
             mensagem="O sistema do DETRAN esta indisponivel no momento.",
             detalhe_tecnico=msg, retentavel=True,
         )
-    # DETRAN retorna "Atencao!!" para dados invalidos ou falha no captcha
     if "atencao" in low or "aten" in low or "erro na consulta" in low:
         return ErroDetalhe(
             tipo=TipoErro.SISTEMA,
@@ -74,6 +65,24 @@ def _stringify(v) -> str:
     return v if isinstance(v, str) else str(v)
 
 
+def _publicar_pdf(local_path: str, nome_arquivo: str) -> str:
+    """
+    Tenta publicar o PDF no Firebase Storage.
+    Retorna a URL do Firebase (assinada, 5 dias) se tiver sucesso,
+    ou a URL local (/api/documentos/...) como fallback.
+    """
+    firebase_url = firebase_storage.upload_pdf(local_path, nome_arquivo)
+    if firebase_url:
+        # Remove o arquivo local para não acumular no disco do Render
+        try:
+            os.remove(local_path)
+        except OSError:
+            pass
+        return firebase_url
+    # Fallback: URL local servida pelo próprio backend
+    return f"/api/documentos/{nome_arquivo}"
+
+
 def _normalizar(consulta: catalog.Consulta, bruto: dict, service) -> ResultadoConsulta:
     """Converte o dict cru do motor no envelope padrao."""
     res = ResultadoConsulta(
@@ -82,7 +91,6 @@ def _normalizar(consulta: catalog.Consulta, bruto: dict, service) -> ResultadoCo
         status=StatusResultado.OK,
     )
 
-    # Erro reportado pelo proprio parser
     if bruto.get("erro"):
         res.status = StatusResultado.ERRO
         res.erro = ErroDetalhe(
@@ -92,21 +100,18 @@ def _normalizar(consulta: catalog.Consulta, bruto: dict, service) -> ResultadoCo
         )
         return res
 
-    # Dados achatados
     for k, v in (bruto.get("dados") or {}).items():
         if isinstance(v, dict):
             res.secoes[_stringify(k)] = {kk: _stringify(vv) for kk, vv in v.items()}
         else:
             res.dados[_stringify(k)] = _stringify(v)
 
-    # Secoes ja agrupadas pelo parser
     for nome, conteudo in (bruto.get("secoes") or {}).items():
         if isinstance(conteudo, dict):
             res.secoes[_stringify(nome)] = {
                 kk: _stringify(vv) for kk, vv in conteudo.items()
             }
 
-    # Tabelas (infracoes e tabelas genericas)
     for chave in ("infracoes", "tabelas"):
         bloco = bruto.get(chave)
         if isinstance(bloco, list) and bloco:
@@ -117,18 +122,15 @@ def _normalizar(consulta: catalog.Consulta, bruto: dict, service) -> ResultadoCo
             elif bloco and isinstance(bloco[0], list):
                 res.tabelas.extend(bloco)
 
-    # "Nada consta" => sucesso, mas sem dados
     if bruto.get("nada_consta") and not res.dados and not res.tabelas:
         res.status = StatusResultado.SEM_DADOS
 
-    # Documentos / PDF
     _anexar_documentos(consulta, bruto, service, res)
 
     if not res.dados and not res.tabelas and not res.documentos and not res.secoes:
         res.status = StatusResultado.SEM_DADOS
 
     return res
-
 
 def _anexar_documentos(consulta, bruto, service, res: ResultadoConsulta):
     if not (consulta.gera_pdf or bruto.get("pdf_path") or bruto.get("pdf_link")):
@@ -138,12 +140,10 @@ def _anexar_documentos(consulta, bruto, service, res: ResultadoConsulta):
     destino = os.path.join(settings.STORAGE_DIR, destino_nome)
 
     salvo = False
-    # Caso o service ja tenha salvo
     if bruto.get("pdf_path") and os.path.exists(bruto["pdf_path"]):
         destino = bruto["pdf_path"]
         destino_nome = os.path.basename(destino)
         salvo = True
-    # Senao, baixar pelo link usando a sessao autenticada do motor
     elif bruto.get("pdf_link"):
         try:
             salvo = service.jsf.save_pdf(bruto["pdf_link"], destino)
@@ -152,22 +152,18 @@ def _anexar_documentos(consulta, bruto, service, res: ResultadoConsulta):
 
     if salvo and os.path.exists(destino):
         tamanho = os.path.getsize(destino)
+        url = _publicar_pdf(destino, destino_nome)
         res.documentos.append(Documento(
             tipo="pdf",
             nome=f"{consulta.titulo}",
-            url=f"/api/documentos/{destino_nome}",
+            url=url,
             tamanho_bytes=tamanho,
         ))
 
 
-# --------------------------------------------------------------------------- #
-# Dispatch: slug -> chamada do motor com os parametros corretos
-# --------------------------------------------------------------------------- #
-
 def _exec_handler(consulta: catalog.Consulta, p: dict, salvar_pdf: str | None):
     solver = _novo_solver()
     h = consulta.handler
-    captcha_token = p.get("mcaptcha_token") or p.get("captcha_token")
 
     if consulta.sistema == catalog.Sistema.RENACH:
         svc = RenachService(solver)
@@ -175,34 +171,25 @@ def _exec_handler(consulta: catalog.Consulta, p: dict, salvar_pdf: str | None):
         svc = SistransitoService(solver)
 
     if h == "consulta_veiculo":
-        bruto = svc.consulta_veiculo(p["placa"], p["renavam"], captcha_token=captcha_token)
+        bruto = svc.consulta_veiculo(p["placa"], p["renavam"])
     elif h == "consulta_infracoes":
-        bruto = svc.consulta_infracoes(p["placa"], p["renavam"], captcha_token=captcha_token)
+        bruto = svc.consulta_infracoes(p["placa"], p["renavam"])
     elif h == "boleto_licenciamento_atual":
-        bruto = svc.boleto_licenciamento_atual(
-            p["placa"], p["renavam"], salvar_pdf=salvar_pdf, captcha_token=captcha_token
-        )
+        bruto = svc.boleto_licenciamento_atual(p["placa"], p["renavam"], salvar_pdf=salvar_pdf)
     elif h == "boleto_licenciamento_anterior":
-        bruto = svc.boleto_licenciamento_anterior(
-            p["placa"], p["renavam"], salvar_pdf=salvar_pdf, captcha_token=captcha_token
-        )
+        bruto = svc.boleto_licenciamento_anterior(p["placa"], p["renavam"], salvar_pdf=salvar_pdf)
     elif h == "boleto_infracao":
-        bruto = svc.boleto_infracao(
-            p["placa"], p["renavam"], veiculo_para=True, captcha_token=captcha_token
-        )
+        bruto = svc.boleto_infracao(p["placa"], p["renavam"], veiculo_para=True)
     elif h == "gravame":
-        bruto = svc.gravame(p["chassi"], captcha_token=captcha_token)
+        bruto = svc.gravame(p["chassi"])
     elif h == "crlv_e":
-        bruto = svc.crlv_e(
-            p["placa"], p["renavam"], p.get("cpf_cnpj", ""), captcha_token=captcha_token
-        )
+        bruto = svc.crlv_e(p["placa"], p["renavam"], p.get("cpf_cnpj", ""))
     elif h == "acompanha_documento":
         bruto = svc.acompanha_documento(
             renavam=p.get("renavam"),
             chassi=p.get("chassi"),
             no_boleto=p.get("no_boleto") or None,
             modo="C" if p.get("chassi") else "P",
-            captcha_token=captcha_token,
         )
     elif h == "consulta_pontuacao_cnh":
         bruto = svc.consulta_pontuacao_cnh(p["cpf"])
@@ -211,7 +198,6 @@ def _exec_handler(consulta: catalog.Consulta, p: dict, salvar_pdf: str | None):
 
     return bruto, svc
 
-
 def executar(slug: str, parametros: dict) -> ResultadoConsulta:
     """Executa uma consulta e devolve sempre um ResultadoConsulta (nunca lanca)."""
     consulta = catalog.obter(slug)
@@ -219,10 +205,9 @@ def executar(slug: str, parametros: dict) -> ResultadoConsulta:
         return ResultadoConsulta(
             slug=slug, titulo=slug, status=StatusResultado.ERRO,
             erro=ErroDetalhe(tipo=TipoErro.VALIDACAO,
-                             mensagem="Consulta nao encontrada.", retentavel=False),
+            mensagem="Consulta nao encontrada.", retentavel=False),
         )
 
-    # Valida campos obrigatorios antes de gastar CAPTCHA
     faltando = [
         c.rotulo for c in consulta.entradas
         if c.obrigatorio and not (parametros.get(c.nome) or "").strip()
@@ -247,22 +232,22 @@ def executar(slug: str, parametros: dict) -> ResultadoConsulta:
     try:
         bruto, svc = _exec_handler(consulta, parametros, salvar_pdf)
         resultado = _normalizar(consulta, bruto, svc)
-    except Exception as exc:  # noqa: BLE001 - queremos sempre devolver envelope
+    except Exception as exc:
         resultado = ResultadoConsulta(
             slug=slug, titulo=consulta.titulo, status=StatusResultado.ERRO,
             erro=_classificar_erro(exc),
         )
 
-    # Consultas sem PDF nativo (veiculo, multas, CNH) ganham um comprovante PDF
-    # gerado pelo backend, para o cliente baixar.
     if resultado.status != StatusResultado.ERRO and not resultado.documentos:
         try:
             nome, caminho = pdf_generator.gerar_comprovante(resultado)
+            tamanho = os.path.getsize(caminho)
+            url = _publicar_pdf(caminho, nome)
             resultado.documentos.append(Documento(
                 tipo="pdf",
                 nome=f"Comprovante - {resultado.titulo}",
-                url=f"/api/documentos/{nome}",
-                tamanho_bytes=os.path.getsize(caminho),
+                url=url,
+                tamanho_bytes=tamanho,
             ))
         except Exception:
             pass

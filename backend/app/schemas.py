@@ -88,11 +88,11 @@ class ItemJob(BaseModel):
 
 class Job(BaseModel):
     job_id: str
+    uid: str = ""
     status: StatusJob = StatusJob.FILA
     criado_em: datetime = Field(default_factory=datetime.utcnow)
     atualizado_em: datetime = Field(default_factory=datetime.utcnow)
     itens: list[ItemJob] = Field(default_factory=list)
-    # Eco dos dados informados (sem dados sensiveis sao guardados longo prazo)
     parametros: dict[str, str] = Field(default_factory=dict)
 
 

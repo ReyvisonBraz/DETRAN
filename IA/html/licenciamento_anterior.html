@@ -1,0 +1,121 @@
+HTTP/1.1 200 OK
+Server: nginx/1.8.1
+Date: Sun, 21 Jun 2026 15:52:45 GMT
+Content-Type: text/html;charset=UTF-8
+Content-Length: 7704
+Connection: keep-alive
+Set-Cookie: INGRESSCOOKIE=1782057166.792.38.118368|04cd0ee6479da4467c69c7f2a9334de9; Expires=Mon, 22-Jun-26 15:52:45 GMT; Max-Age=86400; Path=/; HttpOnly
+Set-Cookie: JSESSIONID=JtZGX6JNsizosYz7J5HH3vX3JcXBCKoAq0Y2Q9nX.renavam-web-77ffcc994d-gnxvd; path=/sistransito/detran-web; HttpOnly
+
+<!DOCTYPE html>
+<!-- 
+versao : 07abcd3 - 17/06/2026-00:23:54 - novo captcha 
+--><html xmlns="http://www.w3.org/1999/xhtml"><head id="j_idt3">	
+    <title>Boleto Licenciamento Ano Anterior</title>	
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />	
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" /><script type="text/javascript" src="/sistransito/detran-web/javax.faces.resource/bootstrap/jquery_002.js.jsf;jsessionid=JtZGX6JNsizosYz7J5HH3vX3JcXBCKoAq0Y2Q9nX.renavam-web-77ffcc994d-gnxvd?ln=js"></script><script type="text/javascript" src="/sistransito/detran-web/javax.faces.resource/bootstrap/popper.js.jsf;jsessionid=JtZGX6JNsizosYz7J5HH3vX3JcXBCKoAq0Y2Q9nX.renavam-web-77ffcc994d-gnxvd?ln=js"></script><script type="text/javascript" src="/sistransito/detran-web/javax.faces.resource/bootstrap/popper.min.js.jsf;jsessionid=JtZGX6JNsizosYz7J5HH3vX3JcXBCKoAq0Y2Q9nX.renavam-web-77ffcc994d-gnxvd?ln=js"></script><script type="text/javascript" src="/sistransito/detran-web/javax.faces.resource/bootstrap/bootstrap.min.js.jsf;jsessionid=JtZGX6JNsizosYz7J5HH3vX3JcXBCKoAq0Y2Q9nX.renavam-web-77ffcc994d-gnxvd?ln=js"></script><script type="text/javascript" src="/sistransito/detran-web/javax.faces.resource/bootstrap/bootstrap-material-design.js.jsf;jsessionid=JtZGX6JNsizosYz7J5HH3vX3JcXBCKoAq0Y2Q9nX.renavam-web-77ffcc994d-gnxvd?ln=js"></script><script type="text/javascript" src="/sistransito/detran-web/javax.faces.resource/validacao_convenio.js.jsf;jsessionid=JtZGX6JNsizosYz7J5HH3vX3JcXBCKoAq0Y2Q9nX.renavam-web-77ffcc994d-gnxvd?ln=js"></script><script type="text/javascript" src="/sistransito/detran-web/javax.faces.resource/funcoes.js.jsf;jsessionid=JtZGX6JNsizosYz7J5HH3vX3JcXBCKoAq0Y2Q9nX.renavam-web-77ffcc994d-gnxvd?ln=js"></script>
+
+
+
+<script type="text/javascript">
+function hide() {
+    var layer = document.getElementById('realtooltip');
+    if(layer) layer.style.display = "none";
+}
+
+function show() {
+    var layer = document.getElementById('realtooltip');
+    if(layer) layer.style.display = "flex";
+}
+
+function disableTimeout() { setTimeout(disableTheButton, 100); }
+function disableTheButton() {
+    var btn = document.getElementById('indexBoletoAnoAnterior:confirma');
+    if(btn) { btn.disabled = true; btn.style.opacity = '0.7'; }
+}
+
+function Submeter() {
+    var fFlag = document.getElementById('frmFlag:hidFlag');
+    if(fFlag) fFlag.value = 1;
+}
+
+function validarRecaptcha() {
+    var token = document.getElementById('mcaptcha__token');
+    if (!token || token.value.trim() === '') {
+        alert('Por favor, complete a verificação de segurança!');
+        return false;
+    }
+    show();
+    disableTimeout();
+    Submeter();
+    return true;
+}
+
+window.addEventListener('message', function(event) {
+    if (event.origin !== 'https://mcaptcha.detran.pa.gov.br') return;
+    if (!event.data || !event.data.token) return;
+    var input = document.getElementById('mcaptcha__token');
+    if (input) input.value = event.data.token;
+});
+
+window.onload = function() {
+    hide();
+}
+</script><link type="text/css" rel="stylesheet" href="/sistransito/detran-web/javax.faces.resource/bootstrap/css/material-kit.css.jsf;jsessionid=JtZGX6JNsizosYz7J5HH3vX3JcXBCKoAq0Y2Q9nX.renavam-web-77ffcc994d-gnxvd?ln=css" /><link type="text/css" rel="stylesheet" href="/sistransito/detran-web/javax.faces.resource/bootstrap/css/material-kit.min.css.jsf;jsessionid=JtZGX6JNsizosYz7J5HH3vX3JcXBCKoAq0Y2Q9nX.renavam-web-77ffcc994d-gnxvd?ln=css" /><link type="text/css" rel="stylesheet" href="/sistransito/detran-web/javax.faces.resource/bootstrap/css/fonte.css.jsf;jsessionid=JtZGX6JNsizosYz7J5HH3vX3JcXBCKoAq0Y2Q9nX.renavam-web-77ffcc994d-gnxvd?ln=css" /><link type="text/css" rel="stylesheet" href="/sistransito/detran-web/javax.faces.resource/uls-verticaa.css.jsf;jsessionid=JtZGX6JNsizosYz7J5HH3vX3JcXBCKoAq0Y2Q9nX.renavam-web-77ffcc994d-gnxvd?ln=css" /><link type="text/css" rel="stylesheet" href="/sistransito/detran-web/javax.faces.resource/design-system.css.jsf;jsessionid=JtZGX6JNsizosYz7J5HH3vX3JcXBCKoAq0Y2Q9nX.renavam-web-77ffcc994d-gnxvd?ln=css" /></head>
+
+<body>
+
+<main class="main-container">
+    
+    <div class="title-section">
+        <h2>Boleto Licenciamento Ano Anterior</h2>
+        <p>Emita boleto de licenciamento de exercícios anteriores.</p>
+    </div>
+
+        <div class="tip-box" style="width: 100%; max-width: 500px; box-sizing: border-box;">
+            <div class="icon-container">
+                <i class="material-icons">info</i>
+            </div>
+            <p><b>Dica:</b> Tenha em mãos o documento do veículo (CRLV) para localizar a Placa e o número do Renavam.</p>
+        </div>
+
+    <div class="form-card" style="width: 100%; max-width: 500px; box-sizing: border-box;">
+<form id="frmFlag" name="frmFlag" method="post" action="/sistransito/detran-web/servicos/b/indexBLicencAnoAnterior.jsf;jsessionid=JtZGX6JNsizosYz7J5HH3vX3JcXBCKoAq0Y2Q9nX.renavam-web-77ffcc994d-gnxvd" enctype="application/x-www-form-urlencoded">
+<input type="hidden" name="frmFlag" value="frmFlag" />
+<input id="frmFlag:hidFlag" type="hidden" name="frmFlag:hidFlag" value="0" /><input type="hidden" name="javax.faces.ViewState" id="j_id1:javax.faces.ViewState:0" value="-1876328190078513394:-2453155793858028977" autocomplete="off" />
+</form>
+<form id="indexBoletoAnoAnterior" name="indexBoletoAnoAnterior" method="post" action="/sistransito/detran-web/servicos/b/indexBLicencAnoAnterior.jsf;jsessionid=JtZGX6JNsizosYz7J5HH3vX3JcXBCKoAq0Y2Q9nX.renavam-web-77ffcc994d-gnxvd" enctype="application/x-www-form-urlencoded">
+<input type="hidden" name="indexBoletoAnoAnterior" value="indexBoletoAnoAnterior" />
+ 
+
+                <div class="input-wrapper"><input id="indexBoletoAnoAnterior:placa1" type="text" name="indexBoletoAnoAnterior:placa1" class="form-control" maxlength="7" onkeyup="return autoTab(this, 7, event);" size="7" placeholder="Placa *" />
+                    <div class="input-icon">
+                        <i class="material-icons">directions_car</i>
+                    </div>
+                </div>
+
+                <div class="input-wrapper"><input id="indexBoletoAnoAnterior:renavam" type="text" name="indexBoletoAnoAnterior:renavam" class="form-control" maxlength="11" onkeypress="nn_KeyWeb();" onkeyup="return autoTab(this, 11, event);" size="11" placeholder="Renavam *" />
+                    <div class="input-icon">
+                        <i class="material-icons">badge</i>
+                    </div>
+                </div>
+
+
+
+                <div style="display: flex; justify-content: center; margin-bottom: 16px;">
+                    <iframe src="https://mcaptcha.detran.pa.gov.br/widget?sitekey=pLmK1r0kfDWi26GT845rxZBaqdFo168p" style="border: none; width: 304px; height: 78px;" title="Verificação de segurança mCaptcha">
+                    </iframe>
+                    <input type="hidden" id="mcaptcha__token" name="mcaptcha__token" value="" />
+                </div><input id="indexBoletoAnoAnterior:confirma" type="submit" name="indexBoletoAnoAnterior:confirma" value="Consultar Orçamento" class="btn-submit" onclick="return validarRecaptcha();" /><input type="submit" name="indexBoletoAnoAnterior:j_idt23" value="Limpar Campos" class="btn-clear" />
+
+                <div id="realtooltip">
+                    <div class="loader"></div>
+                    <div style="color: #0b66c2; font-weight: bold; font-size: 14px;">Aguarde, consultando...</div>
+                </div><input type="hidden" name="javax.faces.ViewState" id="j_id1:javax.faces.ViewState:1" value="-1876328190078513394:-2453155793858028977" autocomplete="off" />
+</form>
+    </div>
+</main>
+
+</body>
+</html>

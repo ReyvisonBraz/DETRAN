@@ -1,0 +1,150 @@
+HTTP/1.1 200 OK
+Server: nginx/1.8.1
+Date: Sun, 21 Jun 2026 15:53:01 GMT
+Content-Type: text/html;charset=UTF-8
+Content-Length: 8189
+Connection: keep-alive
+Set-Cookie: INGRESSCOOKIE=1782057182.854.300.930342|04cd0ee6479da4467c69c7f2a9334de9; Expires=Mon, 22-Jun-26 15:53:01 GMT; Max-Age=86400; Path=/; HttpOnly
+Set-Cookie: JSESSIONID=NteU2CGZXYi5UyoSMDnuRFACSlw40kLY7M8H-aCq.renavam-web-77ffcc994d-gnxvd; path=/sistransito/detran-web; HttpOnly
+
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"><head id="j_idt2">
+	<title>Emissão de CRLV-e</title>
+	<meta charset="utf-8" />
+	<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+	<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" /><script type="text/javascript" src="/sistransito/detran-web/javax.faces.resource/bootstrap/jquery_002.js.jsf;jsessionid=NteU2CGZXYi5UyoSMDnuRFACSlw40kLY7M8H-aCq.renavam-web-77ffcc994d-gnxvd?ln=js"></script><script type="text/javascript" src="/sistransito/detran-web/javax.faces.resource/bootstrap/popper.js.jsf;jsessionid=NteU2CGZXYi5UyoSMDnuRFACSlw40kLY7M8H-aCq.renavam-web-77ffcc994d-gnxvd?ln=js"></script><script type="text/javascript" src="/sistransito/detran-web/javax.faces.resource/bootstrap/popper.min.js.jsf;jsessionid=NteU2CGZXYi5UyoSMDnuRFACSlw40kLY7M8H-aCq.renavam-web-77ffcc994d-gnxvd?ln=js"></script><script type="text/javascript" src="/sistransito/detran-web/javax.faces.resource/bootstrap/bootstrap.min.js.jsf;jsessionid=NteU2CGZXYi5UyoSMDnuRFACSlw40kLY7M8H-aCq.renavam-web-77ffcc994d-gnxvd?ln=js"></script><script type="text/javascript" src="/sistransito/detran-web/javax.faces.resource/bootstrap/bootstrap-material-design.js.jsf;jsessionid=NteU2CGZXYi5UyoSMDnuRFACSlw40kLY7M8H-aCq.renavam-web-77ffcc994d-gnxvd?ln=js"></script><script type="text/javascript" src="/sistransito/detran-web/javax.faces.resource/validacao_convenio.js.jsf;jsessionid=NteU2CGZXYi5UyoSMDnuRFACSlw40kLY7M8H-aCq.renavam-web-77ffcc994d-gnxvd?ln=js"></script><script type="text/javascript" src="/sistransito/detran-web/javax.faces.resource/funcoes.js.jsf;jsessionid=NteU2CGZXYi5UyoSMDnuRFACSlw40kLY7M8H-aCq.renavam-web-77ffcc994d-gnxvd?ln=js"></script>
+
+	<script type="text/javascript">
+		function Go(){return}
+
+		var browserType;
+		if (document.layers) {browserType = "nn4"}
+		if (document.all) {browserType = "ie"}
+		if (window.navigator.userAgent.toLowerCase().match("gecko")) {browserType= "gecko"}
+
+		function hide() {
+		  var layer = document.getElementById('realtooltip');
+		  if(layer) layer.style.display = "none";
+		}
+
+		function show() {
+		  var layer = document.getElementById('realtooltip');
+		  if(layer) layer.style.display = "flex";
+		}
+
+		function disableTimeout() {
+			setTimeout(disableTheButton, 100);
+		}
+		function disableTheButton() {
+			var btn = document.getElementById('indexCRLVe:confirma');
+			if(!btn) btn = document.getElementById('confirma');
+			if(btn) {
+				btn.disabled = true;
+				btn.style.opacity = '0.7';
+			}
+		}
+
+		function Limpa(){}
+		function Atualiza(){}
+		function Submeter(){}
+
+		function validarRecaptcha() {
+			var token = document.getElementById('mcaptcha__token');
+			if (!token || token.value.trim() === '') {
+				alert('Por favor, complete a verificação de segurança!');
+				return false;
+			}
+			show();
+			disableTimeout();
+			return true;
+		}
+
+		window.addEventListener('message', function(event) {
+			if (event.origin !== 'https://mcaptcha.detran.pa.gov.br') return;
+			if (!event.data || !event.data.token) return;
+			var input = document.getElementById('mcaptcha__token');
+			if (input) input.value = event.data.token;
+		});
+
+		function padRenavam(input) {
+			if (input.value && input.value.length === 10) {
+				input.value = "0" + input.value;
+			}
+		}
+
+		window.onload = function() {
+			hide();
+		}
+	</script><link type="text/css" rel="stylesheet" href="/sistransito/detran-web/javax.faces.resource/bootstrap/css/material-kit.css.jsf;jsessionid=NteU2CGZXYi5UyoSMDnuRFACSlw40kLY7M8H-aCq.renavam-web-77ffcc994d-gnxvd?ln=css" /><link type="text/css" rel="stylesheet" href="/sistransito/detran-web/javax.faces.resource/bootstrap/css/material-kit.min.css.jsf;jsessionid=NteU2CGZXYi5UyoSMDnuRFACSlw40kLY7M8H-aCq.renavam-web-77ffcc994d-gnxvd?ln=css" /><link type="text/css" rel="stylesheet" href="/sistransito/detran-web/javax.faces.resource/bootstrap/css/fonte.css.jsf;jsessionid=NteU2CGZXYi5UyoSMDnuRFACSlw40kLY7M8H-aCq.renavam-web-77ffcc994d-gnxvd?ln=css" /><link type="text/css" rel="stylesheet" href="/sistransito/detran-web/javax.faces.resource/uls-verticaa.css.jsf;jsessionid=NteU2CGZXYi5UyoSMDnuRFACSlw40kLY7M8H-aCq.renavam-web-77ffcc994d-gnxvd?ln=css" /><link type="text/css" rel="stylesheet" href="/sistransito/detran-web/javax.faces.resource/design-system.css.jsf;jsessionid=NteU2CGZXYi5UyoSMDnuRFACSlw40kLY7M8H-aCq.renavam-web-77ffcc994d-gnxvd?ln=css" /></head>
+
+<body>
+
+	<main class="main-container">
+
+		<div class="title-section">
+			<h2>Emissão de CRLV-e</h2>
+			<p>Gere e imprima o Certificado de Registro e Licenciamento de Veículo Eletrônico.</p>
+		</div>
+
+		<div class="tip-box" style="width: 100%; max-width: 500px; box-sizing: border-box;">
+			<div class="icon-container">
+				<i class="material-icons">info</i>
+			</div>
+			<p>Esta consulta restringe-se às informações da base de dados do DETRAN-PA.
+			   Para consultar a base nacional (SENATRAN) acesse
+			   <a href="https://portalservicos.senatran.serpro.gov.br" target="_blank" style="color: #0b66c2; font-weight: bold;">portalservicos.senatran.serpro.gov.br</a>.
+			   Preencha os campos abaixo para iniciar a emissão:</p>
+		</div>
+
+		<div class="form-card" style="width: 100%; max-width: 500px; box-sizing: border-box;">
+<form id="indexCRLVe" name="indexCRLVe" method="post" action="/sistransito/detran-web/servicos/crlv/indexCRLVe.jsf;jsessionid=NteU2CGZXYi5UyoSMDnuRFACSlw40kLY7M8H-aCq.renavam-web-77ffcc994d-gnxvd" enctype="application/x-www-form-urlencoded">
+<input type="hidden" name="indexCRLVe" value="indexCRLVe" />
+
+
+
+
+				<div class="input-wrapper"><input id="indexCRLVe:placa" type="text" name="indexCRLVe:placa" autocomplete="off" class="form-control" maxlength="7" onblur="value=value.toUpperCase();" onkeyup="return autoTab(this, 7, event);" size="7" placeholder="Placa do Veículo *" />
+					<div class="input-icon">
+						<i class="material-icons">subtitles</i>
+					</div>
+				</div>
+
+				<div class="input-wrapper"><input id="indexCRLVe:renavam" type="text" name="indexCRLVe:renavam" autocomplete="off" class="form-control" maxlength="11" onblur="padRenavam(this);" onkeypress="nn_KeyWeb();" onkeyup="return autoTab(this, 11, event);" size="11" placeholder="Número do Renavam *" />
+					<div class="input-icon">
+						<i class="material-icons">directions_car</i>
+					</div>
+				</div>
+
+				<div class="input-wrapper"><input id="indexCRLVe:cpfCnpj" type="text" name="indexCRLVe:cpfCnpj" autocomplete="off" class="form-control" maxlength="14" onkeypress="nn_KeyWeb();" onkeyup="return autoTab(this, 14, event);" size="14" placeholder="CPF / CNPJ do Proprietário *" />
+					<div class="input-icon">
+						<i class="material-icons">person</i>
+					</div>
+				</div>
+
+				<div style="display: flex; justify-content: center; margin-bottom: 16px;">
+					<iframe src="https://mcaptcha.detran.pa.gov.br/widget?sitekey=pLmK1r0kfDWi26GT845rxZBaqdFo168p" style="border: none; width: 304px; height: 78px;" title="Verificação de segurança mCaptcha">
+					</iframe>
+					<input type="hidden" id="mcaptcha__token" name="mcaptcha__token" value="" />
+				</div>
+<script type="text/javascript" src="/sistransito/detran-web/javax.faces.resource/jsf.js.jsf?ln=javax.faces"></script>
+<a id="indexCRLVe:confirma" href="#" onclick="jsf.util.chain(this,event,'return validarRecaptcha();','mojarra.jsfcljs(document.getElementById(\'indexCRLVe\'),{\'indexCRLVe:confirma\':\'indexCRLVe:confirma\'},\'\')');return false" class="btn-submit">
+					<i class="material-icons">print</i> Gerar CRLV-e PDF
+				</a><a id="indexCRLVe:btnLimpar" href="#" onclick="mojarra.jsfcljs(document.getElementById('indexCRLVe'),{'indexCRLVe:btnLimpar':'indexCRLVe:btnLimpar'},'');return false" class="btn-clear">
+					Limpar Campos
+				</a>
+
+				<div id="realtooltip">
+					<div class="loader"></div>
+					<div style="color: #0b66c2; font-weight: bold; font-size: 14px;">Autenticando dados...</div>
+				</div><input type="hidden" name="javax.faces.ViewState" id="j_id1:javax.faces.ViewState:0" value="-4587909804062758906:8465634564591792146" autocomplete="off" />
+</form>
+		</div>
+
+		<div class="help-footer">
+			<a href="#">Dúvidas sobre o documento eletrônico?</a>
+		</div>
+
+	</main>
+
+</body>
+</html>

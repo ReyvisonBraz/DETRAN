@@ -5,7 +5,7 @@ load_dotenv()
 
 TWOCAPTCHA_API_KEY = os.getenv("TWOCAPTCHA_API_KEY", "")
 
-RECAPTCHA_SITE_KEY = "6LfDIwMtAAAAAKL8RPTzJd_fDTfWCOZXDv79aJhK"
+MCAPTCHA_SITE_KEY = "pLmK1r0kfDWi26GT845rxZBaqdFo168p"
 
 SISTRANSITO_BASE = "https://sistemas-renavam.detran.pa.gov.br/sistransito/detran-web"
 RENACH_BASE = "https://sistemas-renach.detran.pa.gov.br/renach/renach-web"

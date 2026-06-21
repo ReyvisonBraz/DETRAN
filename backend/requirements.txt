@@ -7,3 +7,4 @@ lxml>=5.0.0
 2captcha-python>=1.5.0
 fpdf2>=2.7.0
 rich>=13.0.0
+firebase-admin>=6.5.0

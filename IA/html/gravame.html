@@ -1,0 +1,139 @@
+HTTP/1.1 200 OK
+Server: nginx/1.8.1
+Date: Sun, 21 Jun 2026 15:52:56 GMT
+Content-Type: text/html;charset=UTF-8
+Content-Length: 8013
+Connection: keep-alive
+Set-Cookie: INGRESSCOOKIE=1782057177.493.33.648530|04cd0ee6479da4467c69c7f2a9334de9; Expires=Mon, 22-Jun-26 15:52:56 GMT; Max-Age=86400; Path=/; HttpOnly
+Set-Cookie: JSESSIONID=m51d1y-ZypgjaQrxTzD63Fci2Akc2NSSQ-bGXE5a.renavam-web-77ffcc994d-mx85z; path=/sistransito/detran-web; HttpOnly
+
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"><head id="j_idt2">	
+    <title>Consulta ao SNG</title>	
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />	
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />	
+
+    <!-- Bibliotecas originais do projeto --><script type="text/javascript" src="/sistransito/detran-web/javax.faces.resource/bootstrap/jquery_002.js.jsf;jsessionid=m51d1y-ZypgjaQrxTzD63Fci2Akc2NSSQ-bGXE5a.renavam-web-77ffcc994d-mx85z?ln=js"></script><script type="text/javascript" src="/sistransito/detran-web/javax.faces.resource/bootstrap/popper.js.jsf;jsessionid=m51d1y-ZypgjaQrxTzD63Fci2Akc2NSSQ-bGXE5a.renavam-web-77ffcc994d-mx85z?ln=js"></script><script type="text/javascript" src="/sistransito/detran-web/javax.faces.resource/bootstrap/popper.min.js.jsf;jsessionid=m51d1y-ZypgjaQrxTzD63Fci2Akc2NSSQ-bGXE5a.renavam-web-77ffcc994d-mx85z?ln=js"></script><script type="text/javascript" src="/sistransito/detran-web/javax.faces.resource/bootstrap/bootstrap.min.js.jsf;jsessionid=m51d1y-ZypgjaQrxTzD63Fci2Akc2NSSQ-bGXE5a.renavam-web-77ffcc994d-mx85z?ln=js"></script><script type="text/javascript" src="/sistransito/detran-web/javax.faces.resource/bootstrap/bootstrap-material-design.js.jsf;jsessionid=m51d1y-ZypgjaQrxTzD63Fci2Akc2NSSQ-bGXE5a.renavam-web-77ffcc994d-mx85z?ln=js"></script><script type="text/javascript" src="/sistransito/detran-web/javax.faces.resource/validacao_convenio.js.jsf;jsessionid=m51d1y-ZypgjaQrxTzD63Fci2Akc2NSSQ-bGXE5a.renavam-web-77ffcc994d-mx85z?ln=js"></script><script type="text/javascript" src="/sistransito/detran-web/javax.faces.resource/funcoes.js.jsf;jsessionid=m51d1y-ZypgjaQrxTzD63Fci2Akc2NSSQ-bGXE5a.renavam-web-77ffcc994d-mx85z?ln=js"></script>
+
+
+<script type="text/javascript">
+function hide() {
+    var layer = document.getElementById('realtooltip');
+    if(layer) layer.style.display = "none";
+}
+
+function show() {
+    var layer = document.getElementById('realtooltip');
+    if(layer) layer.style.display = "flex";
+}
+
+function disableTimeout() { setTimeout(disableTheButton, 100); }
+function disableTheButton() {
+    var btn = document.getElementById('indexGravame:confirma');
+    if(!btn) btn = document.getElementById('confirma');
+    if(btn) { btn.disabled = true; btn.style.opacity = '0.7'; }
+}
+
+function limpaCampo() {
+    var chassi = document.getElementById('indexGravame:chassi');
+    if(chassi) chassi.value = "";
+}
+
+function Atualiza() {
+   var fFlag = document.getElementById('frmFlag:hidFlag');
+   if(fFlag && fFlag.value == 1) {
+       fFlag.value = 0;
+       window.location.reload();
+       limpaCampo();
+   }
+   if(document.getElementById('indexGravame:chassi')) document.getElementById('indexGravame:chassi').focus();
+}
+
+function Submeter() {
+    var fFlag = document.getElementById('frmFlag:hidFlag');
+    if(fFlag) fFlag.value = 1;
+}
+
+function validarRecaptcha() {
+    var token = document.getElementById('mcaptcha__token');
+    if (!token || token.value.trim() === '') {
+        alert('Por favor, complete a verificação de segurança!');
+        return false;
+    }
+    show();
+    disableTimeout();
+    Submeter();
+    return true;
+}
+
+window.addEventListener('message', function(event) {
+    if (event.origin !== 'https://mcaptcha.detran.pa.gov.br') return;
+    if (!event.data || !event.data.token) return;
+    var input = document.getElementById('mcaptcha__token');
+    if (input) input.value = event.data.token;
+});
+
+window.onload = function() {
+    hide();
+    Atualiza();
+}
+</script><link type="text/css" rel="stylesheet" href="/sistransito/detran-web/javax.faces.resource/bootstrap/css/material-kit.css.jsf;jsessionid=m51d1y-ZypgjaQrxTzD63Fci2Akc2NSSQ-bGXE5a.renavam-web-77ffcc994d-mx85z?ln=css" /><link type="text/css" rel="stylesheet" href="/sistransito/detran-web/javax.faces.resource/bootstrap/css/material-kit.min.css.jsf;jsessionid=m51d1y-ZypgjaQrxTzD63Fci2Akc2NSSQ-bGXE5a.renavam-web-77ffcc994d-mx85z?ln=css" /><link type="text/css" rel="stylesheet" href="/sistransito/detran-web/javax.faces.resource/bootstrap/css/fonte.css.jsf;jsessionid=m51d1y-ZypgjaQrxTzD63Fci2Akc2NSSQ-bGXE5a.renavam-web-77ffcc994d-mx85z?ln=css" /><link type="text/css" rel="stylesheet" href="/sistransito/detran-web/javax.faces.resource/uls-verticaa.css.jsf;jsessionid=m51d1y-ZypgjaQrxTzD63Fci2Akc2NSSQ-bGXE5a.renavam-web-77ffcc994d-mx85z?ln=css" /><link type="text/css" rel="stylesheet" href="/sistransito/detran-web/javax.faces.resource/design-system.css.jsf;jsessionid=m51d1y-ZypgjaQrxTzD63Fci2Akc2NSSQ-bGXE5a.renavam-web-77ffcc994d-mx85z?ln=css" /></head>
+
+<body onUnload="limpaCampo();">
+
+<main class="main-container">
+    
+    <div class="title-section">
+        <h2>Consulta ao SNG</h2>
+        <p>Consulte registros de financiamento e gravames sinalizados no SNG.</p>
+    </div>
+
+    <div class="tip-box" style="width: 100%; max-width: 500px; box-sizing: border-box;">
+        <div class="icon-container">
+            <i class="material-icons">info</i>
+        </div>
+        <p>Esta consulta restringe-se às informações da base de dados do DETRAN-PA.
+           Para consultar a base nacional (SENATRAN) acesse
+           <a href="https://portalservicos.senatran.serpro.gov.br" target="_blank" style="color: #0b66c2; font-weight: bold;">portalservicos.senatran.serpro.gov.br</a>.
+           Caso tenha adquirido um veículo financiado ou feito a quitação de seu financiamento, preencha os campos abaixo.</p>
+    </div>
+
+    <div class="form-card" style="width: 100%; max-width: 500px; box-sizing: border-box;">
+<form id="frmFlag" name="frmFlag" method="post" action="/sistransito/detran-web/servicos/veiculos/indexSNG.jsf;jsessionid=m51d1y-ZypgjaQrxTzD63Fci2Akc2NSSQ-bGXE5a.renavam-web-77ffcc994d-mx85z" enctype="application/x-www-form-urlencoded">
+<input type="hidden" name="frmFlag" value="frmFlag" />
+<input id="frmFlag:hidFlag" type="hidden" name="frmFlag:hidFlag" value="0" /><input type="hidden" name="javax.faces.ViewState" id="j_id1:javax.faces.ViewState:0" value="-6640591613209139690:1824905942837834546" autocomplete="off" />
+</form>
+<form id="indexGravame" name="indexGravame" method="post" action="/sistransito/detran-web/servicos/veiculos/indexSNG.jsf;jsessionid=m51d1y-ZypgjaQrxTzD63Fci2Akc2NSSQ-bGXE5a.renavam-web-77ffcc994d-mx85z" enctype="application/x-www-form-urlencoded">
+<input type="hidden" name="indexGravame" value="indexGravame" />
+
+            
+
+
+            <div class="input-wrapper"><input id="indexGravame:chassi" type="text" name="indexGravame:chassi" autocomplete="off" class="form-control" maxlength="21" onkeyup="return autoTab(this, 21, event);" size="21" placeholder="Número Chassi *" />
+                <div class="input-icon">
+                    <i class="material-icons">directions_car</i>
+                </div>
+            </div>
+
+            <div style="display: flex; justify-content: center; margin-bottom: 16px;">
+                <iframe src="https://mcaptcha.detran.pa.gov.br/widget?sitekey=pLmK1r0kfDWi26GT845rxZBaqdFo168p" style="border: none; width: 304px; height: 78px;" title="Verificação de segurança mCaptcha">
+                </iframe>
+                <input type="hidden" id="mcaptcha__token" name="mcaptcha__token" value="" />
+            </div><input id="indexGravame:confirma" type="submit" name="indexGravame:confirma" value="Consultar SNG" class="btn-submit" onclick="return validarRecaptcha();" />
+
+            <button type="button" onclick="document.getElementById('indexGravame').reset(); return false;" class="btn-clear">
+                Limpar Campos
+            </button>
+
+            <div id="realtooltip">
+                <div class="loader"></div>
+                <div style="color: #0b66c2; font-weight: bold; font-size: 14px;">Aguarde, consultando...</div>
+            </div><input type="hidden" name="javax.faces.ViewState" id="j_id1:javax.faces.ViewState:1" value="-6640591613209139690:1824905942837834546" autocomplete="off" />
+</form>
+    </div>
+
+</main>
+
+</body>
+</html>

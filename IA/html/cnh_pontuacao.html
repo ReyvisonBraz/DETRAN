@@ -1,0 +1,187 @@
+HTTP/1.1 200 OK
+Server: nginx/1.8.1
+Date: Sun, 21 Jun 2026 15:53:12 GMT
+Content-Type: text/html;charset=ISO-8859-1
+Content-Length: 9075
+Connection: keep-alive
+Set-Cookie: INGRESSCOOKIE=1782057193.595.1493.539713|f0d23e964f4a5016a2a8973101043deb; Expires=Mon, 22-Jun-26 15:53:12 GMT; Max-Age=86400; Path=/; HttpOnly
+X-Powered-By: JSF/1.2
+X-Powered-By: JSP/2.3
+Set-Cookie: JSESSIONID=_pKuXLcDoNIW7NtGsRmxj2bf7zdBf-V_bDqtSWLj.renach-web-6bb7d64998-j4pk2; path=/renach/renach-web; HttpOnly
+Content-Language: en-US
+
+
+
+
+
+
+	<!-- Versão 1.153 - 04/03/2026 -->
+	<!doctype html>
+	<html xmlns="http://www.w3.org/1999/xhtml">
+
+<head>
+<title>Consulta pontuação</title>
+<link rel='stylesheet' class='component' type='text/css' href='/renach/renach-web/a4j_3_1_6.GAorg/richfaces/renderkit/html/css/modalPanel.xcss/DATB/eAGTUUl-BQACkAGO.jsf;jsessionid=_pKuXLcDoNIW7NtGsRmxj2bf7zdBf-V_bDqtSWLj.renach-web-6bb7d64998-j4pk2' /><script type='text/javascript' src='/renach/renach-web/a4j_3_1_6.GAorg.ajax4jsf.javascript.AjaxScript.jsf'></script><script type='text/javascript' src='/renach/renach-web/a4j_3_1_6.GAorg.ajax4jsf.javascript.PrototypeScript.jsf'></script><script type='text/javascript' src='/renach/renach-web/a4j_3_1_6.GAorg/richfaces/renderkit/html/scripts/utils.js.jsf'></script><script type='text/javascript' src='/renach/renach-web/a4j_3_1_6.GAorg/richfaces/renderkit/html/scripts/browser_info.js.jsf'></script><script type='text/javascript' src='/renach/renach-web/a4j_3_1_6.GAorg/richfaces/renderkit/html/scripts/modalPanel.js.jsf'></script><script type='text/javascript' src='/renach/renach-web/a4j_3_1_6.GAorg/richfaces/renderkit/html/scripts/modalPanelBorders.js.jsf'></script><meta charset="utf-8" />
+<meta name="viewport"
+	content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
+
+<link href="../../css/bootstrap/css/material-kit.css" rel="stylesheet"
+	type="text/css" />
+<link href="../../css/bootstrap/css/material-kit.min.css"
+	rel="stylesheet" type="text/css" />
+<link href="../../css/bootstrap/css/fonte.css" rel="stylesheet"
+	type="text/css" />
+<!--   <script type="text/javascript" src="../../js/bootstrap/jquery_002.js"></script>
+    <script type="text/javascript" src="../../js/bootstrap/popper.js"></script>
+    <script type="text/javascript" src="../../js/bootstrap/popper.min.js"></script>
+    <script type="text/javascript" src="../../js/bootstrap/bootstrap.min.js"></script>
+    <script type="text/javascript" src="../../js/bootstrap-material-design.js"></script> -->
+
+<link href="../../css/uls-verticaa.css" rel="stylesheet" type="text/css" />
+<link href="../../css/erro.css" rel="stylesheet" type="text/css" />
+<script type="text/javascript" src="../../js/jquery.min.js"></script>
+<script type="text/javascript" src="../../js/geral.js"></script>
+<script type="text/javascript" src="../../js/correcaoProporcaoTela.js"></script>
+</head>
+<body onload="document.getElementById('formJSF:cpf').focus();">
+	
+<form id="formJSF" name="formJSF" method="post" action="/renach/renach-web/servicos/consultaPontuacao/indexConsultaPontuacao.jsf;jsessionid=_pKuXLcDoNIW7NtGsRmxj2bf7zdBf-V_bDqtSWLj.renach-web-6bb7d64998-j4pk2" enctype="application/x-www-form-urlencoded">
+<input type="hidden" name="formJSF" value="formJSF" />
+
+		<div align="center">
+			<div class="container">
+				<div id="nav-tabs">
+					<div class="row">
+						<!-- Tabs with icons on Card -->
+						<div class="card card-nav-tabs">
+							<div class="card-header card-header-primary">
+								<!-- colors: "header-primary", "header-info", "header-success", "header-warning", "header-danger" -->
+								<div class="nav-tabs-navigation">
+									<div class="nav-tabs-wrapper">
+										<ul class="nav nav-tabs" data-tabs="tabs">
+											<li class="nav-item"><a class="nav-link active show"
+												href="#profile" data-toggle="tab"><i
+													class="material-icons">line_weight</i>Consulta pontuação</a></li>
+											<!--<li class="nav-item"> <a class="nav-link" href="#messages" data-toggle="tab"> <i class="material-icons"></i> AJUDA
+                              </a> </li>-->
+										</ul>
+									</div>
+								</div>
+							</div>
+
+							<div class="card-body ">
+								<div class="tab-content text-center">
+									<div class="tab-pane active show" id="profile">
+										<div class="alert alert-warning">Este serviço esta
+											disponível para condutores que possuem CNH(Carteira Nacional
+											de Habilitação) com foto, expedida no Pará e que pretendem
+											emitir boleto de algum serviço referente a sua habilitação.</div>
+
+										
+
+										<div class="form-group">
+											<div class="row">
+												<div class="col-md-3"></div>
+												<div class="col-md-6">
+													<div align="left" style="margin-top: 10px">
+														<span class="textolabelformulario">CPF</span>
+													</div>
+													<input id="formJSF:cpf" type="text" name="formJSF:cpf" class="form-control" maxlength="11" />
+												</div>
+												<div class="col-md-3"></div>
+											</div>
+										</div>
+
+										<div class="form-group">
+											<div class="row">
+												<div class="col-md-3"></div>
+												<div class="col-md-6">
+													<div align="left" style="margin-top: 10px">
+														<span class="textolabelformulario">Digite a
+															sequencia de caracteres</span>
+													</div>
+													<input id="formJSF:senha" type="text" name="formJSF:senha" autocomplete="off" class="form-control" maxlength="5" />
+												</div>
+												<div class="col-md-3"></div>
+											</div>
+										</div>
+
+
+
+										<div style="margin-top: 30px;">
+											<div align="center">
+												<img src="../../imagem" style="border: thin solid black"
+													width="200em" height="100em">
+												
+<script type="text/javascript" language="Javascript">function dpf(f) {var adp = f.adp;if (adp != null) {for (var i = 0;i < adp.length;i++) {f.removeChild(adp[i]);}}};function apf(f, pvp) {var adp = new Array();f.adp = adp;var i = 0;for (k in pvp) {var p = document.createElement("input");p.type = "hidden";p.name = k;p.value = pvp[k];f.appendChild(p);adp[i++] = p;}};function jsfcljs(f, pvp, t) {apf(f, pvp);var ft = f.target;if (t) {f.target = t;}f.submit();f.target = ft;dpf(f);};</script>
+<a href="#" title="Atualizar" onclick="var a=function(){msgAguardeShow();};var b=function(){if(typeof jsfcljs == 'function'){jsfcljs(document.getElementById('formJSF'),{'formJSF:j_id_jsp_1697595030_6':'formJSF:j_id_jsp_1697595030_6'},'');}return false};return (a()==false) ? false : b();"><img src="../../images/refresh.png;jsessionid=_pKuXLcDoNIW7NtGsRmxj2bf7zdBf-V_bDqtSWLj.renach-web-6bb7d64998-j4pk2" height="24" title="Atualizar" width="24" class="botao_redondo" /></a>
+											</div>
+										</div>
+
+										<div align="center" class="row" style="margin-top: 25px">
+											<div class="col-md-8 ml-auto mr-auto">
+												<input type="submit" name="formJSF:j_id_jsp_1697595030_8" value="Confirmar" onclick="msgAguardeShow();" class="btn btn-primary" /><input type="reset" name="formJSF:j_id_jsp_1697595030_9" value="Limpar" class="btn btn-primary" />
+												
+											</div>
+										</div>
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+					<!-- class="card card-nav-tabs" */  -->
+				</div>
+			</div>
+		</div>
+	<input type="hidden" name="javax.faces.ViewState" id="javax.faces.ViewState" value="_id28042" autocomplete="off" />
+</form><div id="msgAguarde" style="display: none;"><input id="msgAguardeOpenedState" name="msgAguardeOpenedState" type="hidden" /><div class="rich-modalpanel " id="msgAguardeContainer" style="position: absolute; display: none; z-index: 2000; background-color: inherit;"><div class="dr-mpnl-mask-div rich-mpnl-mask-div" id="msgAguardeDiv" style="z-index: 1;"><a class="dr-mpnl-pnl-a" href="#" id="msgAguardeFirstHref">_</a></div><div class="dr-mpnl-panel rich-mpnl_panel" id="msgAguardeCDiv"><div class="dr-mpnl-shadow rich-mpnl-shadow" id="msgAguardeShadowDiv" style="top: 4px; left: 4px; opacity:0.1; filter:alpha(opacity=10);"></div><div class="dr-mpnl-pnl rich-mp-content" id="msgAguardeContentDiv" style=" position: absolute; z-index: 2; border-color:#2F74A8;"><table border="0" cellpadding="0" cellspacing="0" id="msgAguardeContentTable" style="width: 1px;height: 1px;"><tr style="height: 99%"><td class="dr-mpnl-pnl-b rich-mpnl-body" valign="top">
+	
+		
+	
+	
+		
+	
+	<table width="300px" border="0" align="center" cellpadding="0" cellspacing="0">
+		<tr class="aguarde">
+			<td align="center">
+				Aguarde... Processando.
+				<br />
+				<img src="../../images/loading.gif;jsessionid=_pKuXLcDoNIW7NtGsRmxj2bf7zdBf-V_bDqtSWLj.renach-web-6bb7d64998-j4pk2" style="border: none;" /><br />
+			</td>
+		</tr>
+	</table>
+</td></tr></table></div></div><div class="dr-mpnl-mask-div rich-mpnl-mask-div" id="msgAguardeCursorDiv" style="filter: alpha(opacity=1); z-index: -200"><a class="dr-mpnl-pnl-a" href="#" id="msgAguardeLastHref">_</a></div><script type="text/javascript">new ModalPanel('msgAguarde',
+				{
+					width: -1,
+					height: -1,
+
+					minWidth: -1,
+					minHeight: -1,
+
+					resizeable: false,
+					moveable: false,
+
+					left: "auto",
+					top: "auto",
+
+					zindex: 2000,
+							
+					onhide: '',
+					onshow: '',
+					
+					keepVisualState: false,
+					showWhenRendered: false,
+					selectBehavior: "disable",
+
+					autosized: true
+				});</script></div></div><script type="text/javascript"></script>
+	
+
+
+
+
+
+</body>
+	</html>
+

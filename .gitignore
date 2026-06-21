@@ -1,0 +1,30 @@
+# Secrets — NUNCA commite estes arquivos
+.env.secrets
+.env
+.env.local
+.env.production
+
+# Build artifacts
+.next/
+__pycache__/
+*.pyc
+*.pyo
+node_modules/
+dist/
+build/
+*.egg-info/
+
+# OS files
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# Temp
+*.log
+*.tmp

@@ -26,7 +26,7 @@ class GerenciadorJobs:
         self._lock = threading.Lock()
         self._pool = ThreadPoolExecutor(max_workers=max_workers)
 
-    def criar(self, consultas: list[ConsultaSelecionada], parametros: dict) -> Job:
+    def criar(self, consultas: list[ConsultaSelecionada], parametros: dict, uid: str = "") -> Job:
         job_id = uuid.uuid4().hex
         itens = []
         for sel in consultas:
@@ -35,7 +35,7 @@ class GerenciadorJobs:
                 slug=sel.slug,
                 titulo=c.titulo if c else sel.slug,
             ))
-        job = Job(job_id=job_id, itens=itens, parametros=parametros)
+        job = Job(job_id=job_id, uid=uid, itens=itens, parametros=parametros)
         with self._lock:
             self._jobs[job_id] = job
         self._pool.submit(self._processar, job_id, consultas, parametros)
