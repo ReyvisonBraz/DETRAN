@@ -50,6 +50,14 @@ service cloud.firestore {
       allow write: if false;  // apenas o backend (service account) escreve
     }
 
+    // ── Jobs ──────────────────────────────────────────────────────────────────
+    // Criados pelo backend (service account). Usuário só lê os próprios.
+    match /jobs/{jobId} {
+      allow read: if request.auth != null
+        && request.auth.uid == resource.data.uid;
+      allow write: if false;  // apenas o backend (service account) escreve
+    }
+
     // Nenhum outro documento é acessível
     match /{document=**} {
       allow read, write: if false;

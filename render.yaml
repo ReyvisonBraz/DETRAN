@@ -1,6 +1,7 @@
 # Blueprint do Render para o backend (FastAPI + motor de scraping).
 # No Render: New + > Blueprint > conecte o repo ReyvisonBraz/DETRAN.
-# Ele le este arquivo e cria o servico. So falta setar a chave TWOCAPTCHA_API_KEY.
+# Ele le este arquivo e cria o servico. As chaves marcadas `sync: false`
+# voce cola no painel do Render (nao ficam no git).
 services:
   - type: web
     name: detran-api
@@ -13,9 +14,24 @@ services:
     region: oregon
     healthCheckPath: /healthz
     envVars:
+      # ── Scraper (2Captcha) ───────────────────────────────────
       - key: TWOCAPTCHA_API_KEY
-        sync: false          # voce cola a chave no painel do Render (nao fica no git)
+        sync: false
+      # ── Backend config ────────────────────────────────────────
       - key: CORS_ORIGINS
         value: "*"           # depois troque pela URL do painel no Vercel
       - key: MAX_WORKERS
         value: "2"
+      # ── Firebase Admin (auth + creditos + storage) ────────────
+      # Obtenha em: Firebase Console > Configuracoes > Contas de servico
+      # > Gerar nova chave privada > copie os campos do JSON
+      - key: FIREBASE_PROJECT_ID
+        sync: false
+      - key: FIREBASE_CLIENT_EMAIL
+        sync: false
+      - key: FIREBASE_PRIVATE_KEY_ID
+        sync: false
+      - key: FIREBASE_PRIVATE_KEY
+        sync: false          # cole entre aspas duplas, mantendo os \n literais
+      - key: FIREBASE_STORAGE_BUCKET
+        sync: false          # ex: detran-pa-8e4ad.firebasestorage.app
