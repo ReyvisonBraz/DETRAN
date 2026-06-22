@@ -41,7 +41,38 @@ def _extract_key_value_pairs(soup: BeautifulSoup) -> dict:
     return result
 
 
+def _limpar_modal_aguarde(soup: BeautifulSoup):
+    # Remove o modal "Aguarde... Processando." que e display:none no HTML,
+    # mas o parser extrai o texto via get_text. Tambem remove scripts/styles.
+    for el_id in ("msgAguarde",):
+        el = soup.find(id=el_id)
+        if el:
+            el.decompose()
+    for tag in soup.find_all(["script", "style", "noscript"]):
+        tag.decompose()
+
+
+def _detectar_erro_li(soup: BeautifulSoup) -> str | None:
+    # RENACH retorna erros em <li class="alert alert-danger">CPF invalido!</li>
+    for li in soup.find_all("li", class_="alert"):
+        txt = li.get_text(strip=True)
+        if txt:
+            return txt
+    return None
+
+
 def parse_pontuacao_cnh(html: str, soup: BeautifulSoup) -> dict:
+    _limpar_modal_aguarde(soup)
+
+    erro = _detectar_erro_li(soup)
+    if erro:
+        return {
+            "tipo": "Consulta Pontuação CNH",
+            "dados": {},
+            "erro": erro,
+            "html": html,
+        }
+
     result = {
         "tipo": "Consulta Pontuação CNH",
         "dados": {},

@@ -132,14 +132,20 @@ $backendEnv = @(
     ""
 ) -join "`n"
 
+function Write-EnvFile($path, $content) {
+    # Escreve sem BOM (PowerShell 5.1 -Encoding UTF8 adiciona BOM)
+    $utf8NoBom = New-Object System.Text.UTF8Encoding $false
+    [System.IO.File]::WriteAllText($path, $content + "`n", $utf8NoBom)
+}
+
 $backendPath = Join-Path $Root "backend\.env"
-Set-Content -LiteralPath $backendPath -Value $backendEnv -Encoding UTF8
+Write-EnvFile $backendPath $backendEnv
 Write-Host "[OK] backend/.env" -ForegroundColor Green
 
 # ── 2. Scraper .env ───────────────────────────────────────────────────────────
-$scraperEnv = "TWOCAPTCHA_API_KEY=$($envVars['TWOCAPTCHA_API_KEY'])`n"
+$scraperEnv = "TWOCAPTCHA_API_KEY=$($envVars['TWOCAPTCHA_API_KEY'])"
 $scraperPath = Join-Path $Root "detran-pa-consultas\.env"
-Set-Content -LiteralPath $scraperPath -Value $scraperEnv -Encoding UTF8
+Write-EnvFile $scraperPath $scraperEnv
 Write-Host "[OK] detran-pa-consultas/.env" -ForegroundColor Green
 
 # ── 3. Frontend .env.local ────────────────────────────────────────────────────
@@ -152,12 +158,11 @@ $frontendEnv = @(
     (Env-Line "NEXT_PUBLIC_FIREBASE_PROJECT_ID" $envVars["NEXT_PUBLIC_FIREBASE_PROJECT_ID"]),
     (Env-Line "NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET" $envVars["NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET"]),
     (Env-Line "NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID" $envVars["NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID"]),
-    (Env-Line "NEXT_PUBLIC_FIREBASE_APP_ID" $envVars["NEXT_PUBLIC_FIREBASE_APP_ID"]),
-    ""
+    (Env-Line "NEXT_PUBLIC_FIREBASE_APP_ID" $envVars["NEXT_PUBLIC_FIREBASE_APP_ID"])
 ) -join "`n"
 
 $frontendPath = Join-Path $Root "frontend\.env.local"
-Set-Content -LiteralPath $frontendPath -Value $frontendEnv -Encoding UTF8
+Write-EnvFile $frontendPath $frontendEnv
 Write-Host "[OK] frontend/.env.local" -ForegroundColor Green
 
 # ── Resumo ──────────────────────────────────────────────────────────────────────
